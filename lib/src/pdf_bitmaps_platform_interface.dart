@@ -24,7 +24,7 @@ abstract class PdfBitmapsPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<int?> pdfPageCount({required String pdfUri}) async {
+  Future<int?> pdfPageCount({PDFPageCountParams? params}) async {
     throw UnimplementedError('pdfPageCount() has not been implemented.');
   }
 

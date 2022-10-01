@@ -22,6 +22,7 @@ class PdfBitmaps(
     fun pdfPageCount(
         result: MethodChannel.Result,
         pdfUri: String?,
+        pdfPath: String?,
     ) {
         Log.d(
             LOG_TAG,
@@ -36,7 +37,7 @@ class PdfBitmaps(
         val uiScope = CoroutineScope(Dispatchers.Main)
         job = uiScope.launch {
             try {
-                val pageCount: Int? = getPdfPageCount(pdfUri!!, activity)
+                val pageCount: Int? = getPdfPageCount(pdfUri, pdfPath, activity)
 
                 finishPageCountSuccessfully(pageCount)
             } catch (e: Exception) {
@@ -60,6 +61,7 @@ class PdfBitmaps(
     fun pdfBitmap(
         result: MethodChannel.Result,
         pdfUri: String?,
+        pdfPath: String?,
         pageIndex: Int?,
         quality: Int?
     ) {
@@ -76,7 +78,8 @@ class PdfBitmaps(
         val uiScope = CoroutineScope(Dispatchers.Main)
         job = uiScope.launch {
             try {
-                val bitmap: ByteArray? = getPdfBitmap(pdfUri!!, activity, pageIndex!!, quality!!)
+                val bitmap: ByteArray? =
+                    getPdfBitmap(pdfUri, pdfPath, activity, pageIndex!!, quality!!)
 
                 finishPdfBitmapSuccessfully(bitmap)
             } catch (e: Exception) {

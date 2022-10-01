@@ -122,10 +122,12 @@ class PdfBitmapsPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
             "pdfPageCount" -> pdfBitmaps!!.pdfPageCount(
                 result,
                 pdfUri = call.argument("pdfUri"),
+                pdfPath = call.argument("pdfPath"),
             )
             "pdfBitmap" -> pdfBitmaps!!.pdfBitmap(
                 result,
                 pdfUri = call.argument("pdfUri"),
+                pdfPath = call.argument("pdfPath"),
                 pageIndex = call.argument("pageIndex"),
                 quality = call.argument("quality"),
             )

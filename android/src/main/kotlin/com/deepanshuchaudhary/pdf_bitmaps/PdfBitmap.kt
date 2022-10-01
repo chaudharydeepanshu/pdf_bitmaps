@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.io.FileNotFoundException
 
 
@@ -18,7 +19,8 @@ import java.io.FileNotFoundException
 
 // For getting pdf file page count.
 suspend fun getPdfBitmap(
-    pdfUri: String,
+    pdfUri: String?,
+    pdfPath: String?,
     context: Activity,
     pageIndex: Int,
     quality: Int,
@@ -32,11 +34,9 @@ suspend fun getPdfBitmap(
 
         val contentResolver = context.contentResolver
 
-        suspend fun renderPage(uri: Uri, pageIndex: Int) {
+        suspend fun renderPage(parcelFileDescriptor: ParcelFileDescriptor?, pageIndex: Int) {
             try {
                 yield()
-                val parcelFileDescriptor: ParcelFileDescriptor? =
-                    contentResolver.openFileDescriptor(uri, "r")
                 val pdfRenderer: PdfRenderer?
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && parcelFileDescriptor != null) {
                     pdfRenderer = PdfRenderer(parcelFileDescriptor)
@@ -65,7 +65,13 @@ suspend fun getPdfBitmap(
             }
         }
 
-        renderPage(Uri.parse(pdfUri), pageIndex)
+        val parcelFileDescriptor: ParcelFileDescriptor? = if (pdfPath != null) {
+            ParcelFileDescriptor.open(File(pdfPath), ParcelFileDescriptor.MODE_READ_ONLY)
+        } else {
+            contentResolver.openFileDescriptor(Uri.parse(pdfUri), "r")
+        }
+
+        renderPage(parcelFileDescriptor, pageIndex)
 
         val end = System.nanoTime()
         println("Elapsed time in nanoseconds: ${end - begin}")

@@ -8,11 +8,13 @@ import android.os.ParcelFileDescriptor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
+import java.io.File
 import java.io.FileNotFoundException
 
 // For getting pdf file page count.
 suspend fun getPdfPageCount(
-    pdfUri: String,
+    pdfUri: String?,
+    pdfPath: String?,
     context: Activity,
 ): Int? {
 
@@ -24,13 +26,10 @@ suspend fun getPdfPageCount(
 
         val contentResolver = context.contentResolver
 
-        suspend fun countPages(uri: Uri) {
+        suspend fun countPages(parcelFileDescriptor: ParcelFileDescriptor?) {
             try {
                 yield()
-
                 //https://developer.android.com/training/data-storage/shared/documents-files#open
-                val parcelFileDescriptor: ParcelFileDescriptor? =
-                    contentResolver.openFileDescriptor(uri, "r")
                 val pdfRenderer: PdfRenderer?
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && parcelFileDescriptor != null) {
                     pdfRenderer = PdfRenderer(parcelFileDescriptor)
@@ -43,7 +42,13 @@ suspend fun getPdfPageCount(
             }
         }
 
-        countPages(Uri.parse(pdfUri))
+        val parcelFileDescriptor: ParcelFileDescriptor? = if (pdfPath != null) {
+            ParcelFileDescriptor.open(File(pdfPath), ParcelFileDescriptor.MODE_READ_ONLY)
+        } else {
+            contentResolver.openFileDescriptor(Uri.parse(pdfUri), "r")
+        }
+
+        countPages(parcelFileDescriptor)
 
         println(pageCount)
 

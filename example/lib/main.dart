@@ -48,10 +48,10 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  Future<void> getPDFPageCount({required String pdfUri}) async {
+  Future<void> getPDFPageCount({required PDFPageCountParams? params}) async {
     int pageCount;
     try {
-      pageCount = await _pdfBitmapsPlugin.pdfPageCount(pdfUri: pdfUri) ?? 0;
+      pageCount = await _pdfBitmapsPlugin.pdfPageCount(params: params) ?? 0;
     } on PlatformException {
       pageCount = 0;
     }
@@ -78,6 +78,8 @@ class _MyAppState extends State<MyApp> {
 
   bool rejectByteUpdate = false;
 
+  List<Map<String, dynamic>>? listOfBytesAndIndex;
+
   void updateBytesIntoList(int index) async {
     if (listOfBytesAndIndex![index]["bytes"] == null &&
         rejectByteUpdate != true) {
@@ -91,8 +93,6 @@ class _MyAppState extends State<MyApp> {
       });
     }
   }
-
-  List<Map<String, dynamic>>? listOfBytesAndIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -123,7 +123,10 @@ class _MyAppState extends State<MyApp> {
                 child: const Text('pick pdf')),
             OutlinedButton(
                 onPressed: () {
-                  getPDFPageCount(pdfUri: _pickedFilePath![0]);
+                  final params = PDFPageCountParams(
+                    pdfUri: _pickedFilePath![0],
+                  );
+                  getPDFPageCount(params: params);
                 },
                 child: const Text('Get page count of selected pdf')),
             OutlinedButton(
