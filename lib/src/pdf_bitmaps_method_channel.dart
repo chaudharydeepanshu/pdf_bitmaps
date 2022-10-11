@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'pdf_bitmaps_platform_interface.dart';
@@ -22,26 +23,32 @@ class MethodChannelPdfBitmaps extends PdfBitmapsPlatform {
         'pdfBitmap', params?.toJson());
     return bytes;
   }
+
+  @override
+  Future<List<Uint8List>?> pdfBitmaps({PDFBitmapsParams? params}) async {
+    final List? bytesList =
+        await methodChannel.invokeMethod<List?>('pdfBitmaps', params?.toJson());
+    return bytesList?.cast<Uint8List>();
+  }
+
+  @override
+  Future<String?> cancelBitmaps() async {
+    final String? result =
+        await methodChannel.invokeMethod<String?>('cancelBitmaps');
+    return result;
+  }
 }
 
 /// Parameters for the [pdfPageCount] method.
 class PDFPageCountParams {
-  /// Provide uris of pdf file for page count.
-  final String? pdfUri;
-
   /// Provide path of pdf file page count.
-  final String? pdfPath;
+  final String pdfPath;
 
   /// Create parameters for the [pdfPageCount] method.
-  const PDFPageCountParams({this.pdfUri, this.pdfPath})
-      : assert(pdfUri != null || pdfPath != null,
-            'anyone out of pdfUri or pdfPath is required'),
-        assert(pdfUri == null || pdfPath == null,
-            'either provide only pdfUri or only pdfPath');
+  const PDFPageCountParams({required this.pdfPath});
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      'pdfUri': pdfUri,
       'pdfPath': pdfPath,
     };
   }
@@ -49,32 +56,67 @@ class PDFPageCountParams {
 
 /// Parameters for the [pdfBitmap] method.
 class PDFBitmapParams {
-  /// Provide uris of pdf file for bitmap.
-  final String? pdfUri;
-
   /// Provide path of pdf file for bitmap.
-  final String? pdfPath;
+  final String pdfPath;
 
   /// Provide pdf page index for which you want bitmap.
   final int pageIndex;
 
-  /// Provide pdf page bitmap quality from 1 to 100.
-  final int quality;
+  /// Provide pdf page bitmap scaling from 0.1 to 5.
+  final double scale;
+
+  /// Provide pdf page bitmap background color.
+  final Color backgroundColor;
 
   /// Create parameters for the [pdfBitmap] method.
   const PDFBitmapParams(
-      {this.pdfUri, this.pdfPath, required this.pageIndex, this.quality = 100})
-      : assert(quality > 0 || quality <= 100,
-            'quality should be between 1 to 100'),
-        assert(pdfUri == null || pdfPath == null,
-            'either provide only pdfUri or only pdfPath');
+      {required this.pdfPath,
+      required this.pageIndex,
+      this.scale = 1,
+      this.backgroundColor = Colors.white})
+      : assert(scale > 0 || scale <= 5,
+            'scale should be greater than 0 and less tan or equal to 5');
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      'pdfUri': pdfUri,
       'pdfPath': pdfPath,
       'pageIndex': pageIndex,
-      'quality': quality,
+      'scale': scale,
+      'backgroundColor': '#${backgroundColor.value.toRadixString(16)}',
+    };
+  }
+}
+
+/// Parameters for the [pdfBitmaps] method.
+class PDFBitmapsParams {
+  /// Provide path of pdf file for bitmap.
+  final String pdfPath;
+
+  /// Provide pdf page index for which you want bitmap.
+  final List<int> pagesIndexes;
+
+  /// Provide pdf page bitmap scaling from 0.1 to 5.
+  final double scale;
+
+  /// Provide pdf page bitmap background color.
+  final Color backgroundColor;
+
+  /// Create parameters for the [pdfBitmaps] method.
+  const PDFBitmapsParams(
+      {required this.pdfPath,
+      required this.pagesIndexes,
+      this.scale = 1,
+      this.backgroundColor = Colors.white})
+      : assert(pagesIndexes.length > 0, 'pagesIndexes can\'t be empty'),
+        assert(scale > 0 || scale <= 5,
+            'scale should be greater than 0 and less tan or equal to 5');
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'pdfPath': pdfPath,
+      'pagesIndexes': pagesIndexes,
+      'scale': scale,
+      'backgroundColor': '#${backgroundColor.value.toRadixString(16)}',
     };
   }
 }

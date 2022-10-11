@@ -1,3 +1,11 @@
+## 0.1.1
+
+* BREAKING: `quality` is replaced with `scale` and scale takes a double value greater than 0 & less than and equal to 5 (Also fixes the plugin performance issue).
+* BREAKING: `pdfUri` is replaced with `pdfPath` as now `pdfPath` is capable of taking care both URI path and absolute file path.
+* Added new method `pdfBitmaps()` which takes a list of page indexes and provides a list of Bytes as result.
+* Added new option `backgroundColor` which takes color to apply on the background of the pdf bitmap.
+* Added new method `cancelBitmaps()` which allows cancelling running bitmaps tasks.
+
 ## 0.0.2
 
 * Added support to get bitmaps and page count for both uri and absolute file path.

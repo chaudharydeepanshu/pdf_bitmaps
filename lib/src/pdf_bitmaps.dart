@@ -19,4 +19,19 @@ class PdfBitmaps {
   Future<Uint8List?> pdfBitmap({PDFBitmapParams? params}) async {
     return PdfBitmapsPlatform.instance.pdfBitmap(params: params);
   }
+
+  /// Get the specific page bitmap for a pdf file.
+  ///
+  /// Returns the bitmap or null if operation was cancelled.
+  /// Throws exception on error.
+  Future<List<Uint8List>?> pdfBitmaps({PDFBitmapsParams? params}) async {
+    return PdfBitmapsPlatform.instance.pdfBitmaps(params: params);
+  }
+
+  /// Cancels running bitmaps operation.
+  ///
+  /// Returns the cancelling message.
+  Future<String?> cancelBitmaps() {
+    return PdfBitmapsPlatform.instance.cancelBitmaps();
+  }
 }

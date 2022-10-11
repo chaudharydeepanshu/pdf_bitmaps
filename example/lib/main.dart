@@ -86,7 +86,7 @@ class _MyAppState extends State<MyApp> {
       rejectByteUpdate = true;
       Uint8List? bytes = await _pdfBitmapsPlugin.pdfBitmap(
           params: PDFBitmapParams(
-              pdfUri: _pickedFilePath![0], pageIndex: index, quality: 3));
+              pdfPath: _pickedFilePath![0], pageIndex: index, scale: 0.2));
       setState(() {
         listOfBytesAndIndex![index]["bytes"] = bytes;
         rejectByteUpdate = false;
@@ -124,7 +124,7 @@ class _MyAppState extends State<MyApp> {
             OutlinedButton(
                 onPressed: () {
                   final params = PDFPageCountParams(
-                    pdfUri: _pickedFilePath![0],
+                    pdfPath: _pickedFilePath![0],
                   );
                   getPDFPageCount(params: params);
                 },

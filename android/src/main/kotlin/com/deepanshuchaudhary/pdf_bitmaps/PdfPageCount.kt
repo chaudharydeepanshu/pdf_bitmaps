@@ -13,7 +13,6 @@ import java.io.FileNotFoundException
 
 // For getting pdf file page count.
 suspend fun getPdfPageCount(
-    pdfUri: String?,
     pdfPath: String?,
     context: Activity,
 ): Int? {
@@ -42,11 +41,8 @@ suspend fun getPdfPageCount(
             }
         }
 
-        val parcelFileDescriptor: ParcelFileDescriptor? = if (pdfPath != null) {
-            ParcelFileDescriptor.open(File(pdfPath), ParcelFileDescriptor.MODE_READ_ONLY)
-        } else {
-            contentResolver.openFileDescriptor(Uri.parse(pdfUri), "r")
-        }
+        val parcelFileDescriptor: ParcelFileDescriptor? =
+            contentResolver.openFileDescriptor(Utils().getURI(pdfPath!!), "r")
 
         countPages(parcelFileDescriptor)
 

@@ -21,12 +21,11 @@ class PdfBitmaps(
     // For getting pdf file page count.
     fun pdfPageCount(
         result: MethodChannel.Result,
-        pdfUri: String?,
         pdfPath: String?,
     ) {
         Log.d(
             LOG_TAG,
-            "pdfPageCount - IN, pdfUri=$pdfUri"
+            "pdfPageCount - IN, pdfPath=$pdfPath"
         )
 
         if (!setPendingResult(result)) {
@@ -37,7 +36,7 @@ class PdfBitmaps(
         val uiScope = CoroutineScope(Dispatchers.Main)
         job = uiScope.launch {
             try {
-                val pageCount: Int? = getPdfPageCount(pdfUri, pdfPath, activity)
+                val pageCount: Int? = getPdfPageCount( pdfPath, activity)
 
                 finishPageCountSuccessfully(pageCount)
             } catch (e: Exception) {
@@ -57,17 +56,17 @@ class PdfBitmaps(
         Log.d(LOG_TAG, "pdfPageCount - OUT")
     }
 
-    // For getting pdf file page count.
+    // For getting pdf file page bitmap.
     fun pdfBitmap(
         result: MethodChannel.Result,
-        pdfUri: String?,
         pdfPath: String?,
         pageIndex: Int?,
-        quality: Int?
+        scale: Double?,
+        backgroundColor: String?
     ) {
         Log.d(
             LOG_TAG,
-            "pdfBitmap - IN, pdfUri=$pdfUri"
+            "pdfBitmap - IN, pdfPath=$pdfPath"
         )
 
         if (!setPendingResult(result)) {
@@ -79,7 +78,7 @@ class PdfBitmaps(
         job = uiScope.launch {
             try {
                 val bitmap: ByteArray? =
-                    getPdfBitmap(pdfUri, pdfPath, activity, pageIndex!!, quality!!)
+                    getPdfBitmap(pdfPath, activity, listOf(pageIndex!!), scale!!, backgroundColor!!)?.get(0)
 
                 finishPdfBitmapSuccessfully(bitmap)
             } catch (e: Exception) {
@@ -97,6 +96,58 @@ class PdfBitmaps(
             }
         }
         Log.d(LOG_TAG, "pdfBitmap - OUT")
+    }
+
+    // For getting pdf file pages bitmaps.
+    fun pdfBitmaps(
+        result: MethodChannel.Result,
+        pdfPath: String?,
+        pagesIndexes: List<Int>?,
+        scale: Double?,
+        backgroundColor: String?
+    ) {
+        Log.d(
+            LOG_TAG,
+            "pdfBitmap - IN, pdfPath=$pdfPath"
+        )
+
+        if (!setPendingResult(result)) {
+            finishWithAlreadyActiveError(result)
+            return
+        }
+
+        val uiScope = CoroutineScope(Dispatchers.Main)
+        job = uiScope.launch {
+            try {
+                val bitmaps: List<ByteArray>? =
+                    getPdfBitmap(pdfPath, activity, pagesIndexes!!, scale!!, backgroundColor!!)
+
+                if (bitmaps != null && bitmaps.isEmpty()) {
+                    finishPdfBitmapsSuccessfully(null)
+                } else {
+                    finishPdfBitmapsSuccessfully(bitmaps)
+                }
+            } catch (e: Exception) {
+                finishWithError(
+                    "pdfBitmap_exception",
+                    e.stackTraceToString(),
+                    null
+                )
+            } catch (e: OutOfMemoryError) {
+                finishWithError(
+                    "pdfBitmap_OutOfMemoryError",
+                    e.stackTraceToString(),
+                    null
+                )
+            }
+        }
+        Log.d(LOG_TAG, "pdfBitmap - OUT")
+    }
+
+    fun cancelBitmaps(
+    ) {
+        job?.cancel()
+        Log.d(LOG_TAG, "Canceled Bitmaps")
     }
 
     private fun setPendingResult(
@@ -120,6 +171,11 @@ class PdfBitmaps(
     }
 
     private fun finishPdfBitmapSuccessfully(result: ByteArray?) {
+        pendingResult?.success(result)
+        clearPendingResult()
+    }
+
+    private fun finishPdfBitmapsSuccessfully(result: List<ByteArray>?) {
         pendingResult?.success(result)
         clearPendingResult()
     }

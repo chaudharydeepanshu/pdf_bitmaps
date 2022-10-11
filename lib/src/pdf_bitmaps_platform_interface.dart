@@ -31,4 +31,12 @@ abstract class PdfBitmapsPlatform extends PlatformInterface {
   Future<Uint8List?> pdfBitmap({PDFBitmapParams? params}) async {
     throw UnimplementedError('pdfBitmap() has not been implemented.');
   }
+
+  Future<List<Uint8List>?> pdfBitmaps({PDFBitmapsParams? params}) async {
+    throw UnimplementedError('pdfBitmaps() has not been implemented.');
+  }
+
+  Future<String?> cancelBitmaps() async {
+    throw UnimplementedError('cancelBitmaps() has not been implemented.');
+  }
 }
