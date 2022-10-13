@@ -1,3 +1,7 @@
+## 0.1.2
+
+* Fixes issues due to calling page count while generating bitmaps.
+
 ## 0.1.1
 
 * BREAKING: `quality` is replaced with `scale` and scale takes a double value greater than 0 & less than and equal to 5 (Also fixes the plugin performance issue).

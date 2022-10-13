@@ -1,6 +1,6 @@
 name: pdf_bitmaps
 description: A Flutter pdf bitmaps generator and page counter using Android native pdfRenderer.
-version: 0.1.1
+version: 0.1.2
 homepage: https://github.com/chaudharydeepanshu/pdf_bitmaps
 repository: https://github.com/chaudharydeepanshu/pdf_bitmaps
 issue_tracker: https://github.com/chaudharydeepanshu/pdf_bitmaps/issues
