@@ -54,35 +54,63 @@ class PDFPageCountParams {
   }
 }
 
+class PageInfo {
+  /// Provide pdf page number for which you want bitmap.
+  final int pageNumber;
+
+  /// Provide pdf page rotation angle.
+  final int rotationAngle;
+
+  /// Provide pdf page bitmap scale from 0.1 to 5.
+  final double scale;
+
+  /// Provide pdf page background color.
+  final Color backgroundColor;
+
+  PageInfo({
+    required this.pageNumber,
+    this.rotationAngle = 0,
+    this.scale = 1,
+    this.backgroundColor = Colors.white,
+  })  : assert(scale > 0 || scale <= 5,
+            'scale should be greater than 0 and less tan or equal to 5'),
+        assert(pageNumber > 0, 'pageNumber should be greater than 0');
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'pageNumber': pageNumber,
+      'rotationAngle': rotationAngle,
+      'scale': scale,
+      'backgroundColor': '#${backgroundColor.value.toRadixString(16)}',
+    };
+  }
+
+  // Implement toString to make it easier to see information
+  // when using the print statement.
+  @override
+  String toString() {
+    return 'PageInfo{pageNumber: $pageNumber, rotationAngle: $rotationAngle, scale: $scale, backgroundColor: $backgroundColor}';
+  }
+}
+
 /// Parameters for the [pdfBitmap] method.
 class PDFBitmapParams {
   /// Provide path of pdf file for bitmap.
   final String pdfPath;
 
-  /// Provide pdf page index for which you want bitmap.
-  final int pageIndex;
-
-  /// Provide pdf page bitmap scaling from 0.1 to 5.
-  final double scale;
-
-  /// Provide pdf page bitmap background color.
-  final Color backgroundColor;
+  /// Provide PageInfo for page of pdf for which you want bitmap.
+  final PageInfo pageInfo;
 
   /// Create parameters for the [pdfBitmap] method.
-  const PDFBitmapParams(
-      {required this.pdfPath,
-      required this.pageIndex,
-      this.scale = 1,
-      this.backgroundColor = Colors.white})
-      : assert(scale > 0 || scale <= 5,
-            'scale should be greater than 0 and less tan or equal to 5');
+  const PDFBitmapParams({
+    required this.pdfPath,
+    required this.pageInfo,
+  });
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'pdfPath': pdfPath,
-      'pageIndex': pageIndex,
-      'scale': scale,
-      'backgroundColor': '#${backgroundColor.value.toRadixString(16)}',
+      'pageInfo': pageInfo.toJson(),
     };
   }
 }
@@ -92,31 +120,17 @@ class PDFBitmapsParams {
   /// Provide path of pdf file for bitmap.
   final String pdfPath;
 
-  /// Provide pdf page index for which you want bitmap.
-  final List<int> pagesIndexes;
-
-  /// Provide pdf page bitmap scaling from 0.1 to 5.
-  final double scale;
-
-  /// Provide pdf page bitmap background color.
-  final Color backgroundColor;
+  /// Provide PageInfo List for pages of pdf for which you want bitmap.
+  final List<PageInfo> pagesInfo;
 
   /// Create parameters for the [pdfBitmaps] method.
-  const PDFBitmapsParams(
-      {required this.pdfPath,
-      required this.pagesIndexes,
-      this.scale = 1,
-      this.backgroundColor = Colors.white})
-      : assert(pagesIndexes.length > 0, 'pagesIndexes can\'t be empty'),
-        assert(scale > 0 || scale <= 5,
-            'scale should be greater than 0 and less tan or equal to 5');
+  const PDFBitmapsParams({required this.pdfPath, required this.pagesInfo})
+      : assert(pagesInfo.length > 0, 'pagesInfo list cant be empty');
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'pdfPath': pdfPath,
-      'pagesIndexes': pagesIndexes,
-      'scale': scale,
-      'backgroundColor': '#${backgroundColor.value.toRadixString(16)}',
+      'pagesInfo': pagesInfo.map((e) => e.toJson()).toList(),
     };
   }
 }

@@ -110,10 +110,14 @@ class _MyTestAppState extends State<MyTestApp> {
               OutlinedButton(
                   onPressed: () async {
                     final params = PDFBitmapsParams(
-                        pdfPath: _pickedFilePath![0],
-                        pagesIndexes: [0, 1, 2, 3],
-                        scale: 5,
-                        backgroundColor: Colors.red);
+                      pdfPath: _pickedFilePath![0],
+                      pagesInfo: [
+                        PageInfo(pageNumber: 1, scale: 5),
+                        PageInfo(pageNumber: 2, scale: 5),
+                        PageInfo(pageNumber: 3, scale: 5),
+                        PageInfo(pageNumber: 4, scale: 5)
+                      ],
+                    );
 
                     await getPDFPageBitmaps(params: params);
                   },

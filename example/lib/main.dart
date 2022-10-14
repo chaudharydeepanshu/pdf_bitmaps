@@ -86,7 +86,8 @@ class _MyAppState extends State<MyApp> {
       rejectByteUpdate = true;
       Uint8List? bytes = await _pdfBitmapsPlugin.pdfBitmap(
           params: PDFBitmapParams(
-              pdfPath: _pickedFilePath![0], pageIndex: index, scale: 0.2));
+              pdfPath: _pickedFilePath![0],
+              pageInfo: PageInfo(pageNumber: index + 1, scale: 0.2)));
       setState(() {
         listOfBytesAndIndex![index]["bytes"] = bytes;
         rejectByteUpdate = false;

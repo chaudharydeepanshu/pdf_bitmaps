@@ -30,13 +30,13 @@ import 'package:pdf_bitmaps/pdf_bitmaps.dart';
 ### Getting the page count
 
 ```dart
-int? pageCount = await PdfBitmaps().pdfPageCount(pdfUri: pdfUri)
+int? pageCount = await PdfBitmaps().pdfPageCount(pdfPath: pdfPath)
 ```
 
 ### Getting a pdf page bitmap
 
 ```dart
-Uint8List? bytes = await PdfBitmaps().pdfBitmap(params: PDFBitmapParams(pdfUri: pdfUri, pageIndex: 2, quality: 3));
+Uint8List? bytes = await PdfBitmaps().pdfBitmap(params: PDFBitmapParams(pdfPath: pdfPath, pageInfo: PageInfo(pageNumber: 5, rotationAngle: 153, scale: 1.6, backgroundColor: Colors.red)));
 ```
 Note: ```pageIndex``` starts from 0 to (PdfPageCount - 1) and ```quality``` can be from 1 to 100.
 

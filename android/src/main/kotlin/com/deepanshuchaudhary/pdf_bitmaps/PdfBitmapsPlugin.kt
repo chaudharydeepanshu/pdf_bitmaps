@@ -126,16 +126,17 @@ class PdfBitmapsPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
             "pdfBitmap" -> pdfBitmaps!!.pdfBitmap(
                 result,
                 pdfPath = call.argument("pdfPath"),
-                pageIndex = call.argument("pageIndex"),
-                scale = call.argument("scale"),
-                backgroundColor = call.argument("backgroundColor"),
+                pageInfo = PageInfo(
+                    pageNumber = call.argument<Map<String, Int>>("pageInfo")!!["pageNumber"]!!,
+                    rotationAngle = call.argument<Map<String, Int>>("pageInfo")!!["rotationAngle"]!!,
+                    scale = call.argument<Map<String, Double>>("pageInfo")!!["scale"]!!,
+                    backgroundColor = call.argument<Map<String, String>>("pageInfo")!!["backgroundColor"]!!
+                ),
             )
             "pdfBitmaps" -> pdfBitmaps!!.pdfBitmaps(
                 result,
                 pdfPath = call.argument("pdfPath"),
-                pagesIndexes = call.argument("pagesIndexes"),
-                scale = call.argument("scale"),
-                backgroundColor = call.argument("backgroundColor"),
+                pagesInfo = parseMethodCallArrayOfPageInfoArgument(call, "pagesInfo") ?: listOf(),
             )
             "cancelBitmaps" -> pdfBitmaps!!.cancelBitmaps()
             else -> result.notImplemented()
@@ -156,5 +157,26 @@ class PdfBitmapsPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
         Log.d(LOG_TAG, "createPdfBitmaps - OUT")
 
         return pdfBitmaps != null
+    }
+
+    private fun parseMethodCallArrayOfPageInfoArgument(
+        call: MethodCall,
+        arg: String
+    ): List<PageInfo>? {
+        if (call.hasArgument(arg)) {
+            val tempArrayOfMap = call.argument<ArrayList<Map<String, Any>>>(arg)?.toList()
+            val pagesInfo: MutableList<PageInfo> = mutableListOf()
+            tempArrayOfMap!!.forEach {
+                val temp = PageInfo(
+                    pageNumber = it["pageNumber"]!! as Int,
+                    rotationAngle = it["rotationAngle"]!! as Int,
+                    scale = it["scale"]!! as Double,
+                    backgroundColor = it["backgroundColor"]!! as String?,
+                )
+                pagesInfo.add(temp)
+            }
+            return pagesInfo
+        }
+        return null
     }
 }

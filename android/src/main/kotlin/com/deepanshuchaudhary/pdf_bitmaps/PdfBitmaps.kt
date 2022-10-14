@@ -52,9 +52,7 @@ class PdfBitmaps(
     fun pdfBitmap(
         result: MethodChannel.Result,
         pdfPath: String?,
-        pageIndex: Int?,
-        scale: Double?,
-        backgroundColor: String?
+        pageInfo: PageInfo?
     ) {
         Log.d(
             LOG_TAG,
@@ -68,9 +66,7 @@ class PdfBitmaps(
                     getPdfBitmap(
                         pdfPath,
                         activity,
-                        listOf(pageIndex!!),
-                        scale!!,
-                        backgroundColor!!
+                        listOf(pageInfo!!)
                     )?.get(0)
 
                 finishPdfBitmapSuccessfully(bitmap, result)
@@ -95,9 +91,7 @@ class PdfBitmaps(
     fun pdfBitmaps(
         result: MethodChannel.Result,
         pdfPath: String?,
-        pagesIndexes: List<Int>?,
-        scale: Double?,
-        backgroundColor: String?
+        pagesInfo: List<PageInfo>?
     ) {
         Log.d(
             LOG_TAG,
@@ -108,7 +102,7 @@ class PdfBitmaps(
         job = uiScope.launch {
             try {
                 val bitmaps: List<ByteArray>? =
-                    getPdfBitmap(pdfPath, activity, pagesIndexes!!, scale!!, backgroundColor!!)
+                    getPdfBitmap(pdfPath, activity, pagesInfo!!)
 
                 if (bitmaps != null && bitmaps.isEmpty()) {
                     finishPdfBitmapsSuccessfully(null, result)

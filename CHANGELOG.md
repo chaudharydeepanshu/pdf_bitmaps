@@ -1,3 +1,10 @@
+## 0.2.1
+
+* BREAKING: Removed `scale`, `backgroundColor`, `pageIndex`, `pagesIndexes`.
+* Added `pageInfo` to be used like `params: PDFBitmapParams(pdfPath: pdfPath, pageInfo: PageInfo(pageNumber: 5, rotationAngle: 153, scale: 1.6, backgroundColor: Colors.red))`.
+* Added `pagesInfo` to be used like `params: PDFBitmapsParams(pdfPath: pdfPath, pagesInfo: [PageInfo(pageNumber: 5, rotationAngle: 153, scale: 1.6, backgroundColor: Colors.red)])`.
+* Updated example and readme.
+
 ## 0.1.2
 
 * Fixes issues due to calling page count while generating bitmaps.
