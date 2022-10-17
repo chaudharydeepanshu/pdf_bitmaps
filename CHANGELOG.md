@@ -1,6 +1,11 @@
+## 0.2.3
+
+* Fixed 0.2.2 changelog.
+
 ## 0.2.2
 
 * Added `pdfPagesSize` method for getting size info of a page of pdf.
+* BREAKING: `PageInfo` replaced with `PDFBitmapParams`.
 
 ## 0.2.1
 
