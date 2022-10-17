@@ -32,6 +32,21 @@ class MethodChannelPdfBitmaps extends PdfBitmapsPlatform {
   }
 
   @override
+  Future<PageSizeInfo?> pdfPageSize({PDFPageSizeParams? params}) async {
+    final List? result = await methodChannel.invokeMethod<List?>(
+        'pdfPageSize', params?.toJson());
+    result?.cast<int>();
+    if (result == null) {
+      return null;
+    } else {
+      return PageSizeInfo(
+        widthOfPage: result[0] as int,
+        heightOfPage: result[1] as int,
+      );
+    }
+  }
+
+  @override
   Future<String?> cancelBitmaps() async {
     final String? result =
         await methodChannel.invokeMethod<String?>('cancelBitmaps');
@@ -54,7 +69,7 @@ class PDFPageCountParams {
   }
 }
 
-class PageInfo {
+class BitmapConfigForPage {
   /// Provide pdf page number for which you want bitmap.
   final int pageNumber;
 
@@ -67,7 +82,7 @@ class PageInfo {
   /// Provide pdf page background color.
   final Color backgroundColor;
 
-  PageInfo({
+  BitmapConfigForPage({
     required this.pageNumber,
     this.rotationAngle = 0,
     this.scale = 1,
@@ -99,7 +114,7 @@ class PDFBitmapParams {
   final String pdfPath;
 
   /// Provide PageInfo for page of pdf for which you want bitmap.
-  final PageInfo pageInfo;
+  final BitmapConfigForPage pageInfo;
 
   /// Create parameters for the [pdfBitmap] method.
   const PDFBitmapParams({
@@ -121,7 +136,7 @@ class PDFBitmapsParams {
   final String pdfPath;
 
   /// Provide PageInfo List for pages of pdf for which you want bitmap.
-  final List<PageInfo> pagesInfo;
+  final List<BitmapConfigForPage> pagesInfo;
 
   /// Create parameters for the [pdfBitmaps] method.
   const PDFBitmapsParams({required this.pdfPath, required this.pagesInfo})
@@ -131,6 +146,53 @@ class PDFBitmapsParams {
     return <String, dynamic>{
       'pdfPath': pdfPath,
       'pagesInfo': pagesInfo.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+class PageSizeInfo {
+  /// Pdf page width.
+  final int widthOfPage;
+
+  /// Pdf page height.
+  final int heightOfPage;
+
+  PageSizeInfo({
+    required this.widthOfPage,
+    required this.heightOfPage,
+  });
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'widthOfPage': widthOfPage,
+      'heightOfPage': heightOfPage,
+    };
+  }
+
+  // Implement toString to make it easier to see information
+  // when using the print statement.
+  @override
+  String toString() {
+    return 'PageSizeInfo{widthOfPage: $widthOfPage, heightOfPage: $heightOfPage}';
+  }
+}
+
+/// Parameters for the [pdfPageSize] method.
+class PDFPageSizeParams {
+  /// Provide path of pdf file for bitmap.
+  final String pdfPath;
+
+  /// Provide PageInfo List for pages of pdf for which you want bitmap.
+  final int pageNumber;
+
+  /// Create parameters for the [pdfPageSize] method.
+  const PDFPageSizeParams({required this.pdfPath, required this.pageNumber})
+      : assert(pageNumber > 0, 'pageNumber should be greater than 0');
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'pdfPath': pdfPath,
+      'pageNumber': pageNumber,
     };
   }
 }

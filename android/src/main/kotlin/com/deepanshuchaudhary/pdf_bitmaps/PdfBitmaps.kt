@@ -48,6 +48,44 @@ class PdfBitmaps(
         Log.d(LOG_TAG, "pdfPageCount - OUT")
     }
 
+    // For getting pdf file page size info.
+    fun pdfPageSizeInfo(
+        result: MethodChannel.Result,
+        pdfPath: String?,
+        pageNumber: Int?,
+    ) {
+        Log.d(
+            LOG_TAG,
+            "pdfPageSizeInfo - IN, pdfPath=$pdfPath"
+        )
+
+        val uiScope = CoroutineScope(Dispatchers.Main)
+        job = uiScope.launch {
+            try {
+                val pdfPageSizeInfo: List<Int> = getPdfPageSize(pdfPath!!, pageNumber!!, activity)
+
+                if (pdfPageSizeInfo.isEmpty()) {
+                    finishSplitSuccessfullyWithListOfInt(null, result)
+                } else {
+                    finishSplitSuccessfullyWithListOfInt(pdfPageSizeInfo, result)
+                }
+            } catch (e: Exception) {
+                finishWithError(
+                    "pdfPageSizeInfo_exception",
+                    e.stackTraceToString(),
+                    null, result
+                )
+            } catch (e: OutOfMemoryError) {
+                finishWithError(
+                    "pdfPageSizeInfo_OutOfMemoryError",
+                    e.stackTraceToString(),
+                    null, result
+                )
+            }
+        }
+        Log.d(LOG_TAG, "pdfPageSizeInfo - OUT")
+    }
+
     // For getting pdf file page bitmap.
     fun pdfBitmap(
         result: MethodChannel.Result,
@@ -67,7 +105,7 @@ class PdfBitmaps(
                         pdfPath,
                         activity,
                         listOf(pageInfo!!)
-                    )?.get(0)
+                    ).get(0)
 
                 finishPdfBitmapSuccessfully(bitmap, result)
             } catch (e: Exception) {
@@ -132,10 +170,6 @@ class PdfBitmaps(
         Log.d(LOG_TAG, "Canceled Bitmaps")
     }
 
-    private fun finishWithAlreadyActiveError(result: MethodChannel.Result) {
-        result.error("already_active", "Already active", null)
-    }
-
     private fun finishPageCountSuccessfully(result: Int?, resultCallback: MethodChannel.Result?) {
         resultCallback?.success(result)
     }
@@ -149,6 +183,13 @@ class PdfBitmaps(
 
     private fun finishPdfBitmapsSuccessfully(
         result: List<ByteArray>?,
+        resultCallback: MethodChannel.Result?
+    ) {
+        resultCallback?.success(result)
+    }
+
+    private fun finishSplitSuccessfullyWithListOfInt(
+        result: List<Int>?,
         resultCallback: MethodChannel.Result?
     ) {
         resultCallback?.success(result)

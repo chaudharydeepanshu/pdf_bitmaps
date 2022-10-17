@@ -87,7 +87,8 @@ class _MyAppState extends State<MyApp> {
       Uint8List? bytes = await _pdfBitmapsPlugin.pdfBitmap(
           params: PDFBitmapParams(
               pdfPath: _pickedFilePath![0],
-              pageInfo: PageInfo(pageNumber: index + 1, scale: 0.2)));
+              pageInfo:
+                  BitmapConfigForPage(pageNumber: index + 1, scale: 0.2)));
       setState(() {
         listOfBytesAndIndex![index]["bytes"] = bytes;
         rejectByteUpdate = false;
@@ -170,6 +171,15 @@ class _MyAppState extends State<MyApp> {
                         }),
                   )
                 : const SizedBox(),
+            OutlinedButton(
+                onPressed: () async {
+                  PageSizeInfo? pageSizeInfo =
+                      await _pdfBitmapsPlugin.pdfPageSize(
+                          params: PDFPageSizeParams(
+                              pdfPath: _pickedFilePath![0], pageNumber: 1));
+                  print(pageSizeInfo);
+                },
+                child: const Text('Get 1st page size info of pdf')),
           ],
         ),
       ),

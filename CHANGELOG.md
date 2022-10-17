@@ -1,3 +1,7 @@
+## 0.2.2
+
+* Added `pdfPagesSize` method for getting size info of a page of pdf.
+
 ## 0.2.1
 
 * BREAKING: Removed `scale`, `backgroundColor`, `pageIndex`, `pagesIndexes`.

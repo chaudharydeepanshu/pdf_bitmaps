@@ -28,6 +28,14 @@ class PdfBitmaps {
     return PdfBitmapsPlatform.instance.pdfBitmaps(params: params);
   }
 
+  /// Get the specific page size info for a pdf file.
+  ///
+  /// Returns the bitmap or null if operation was cancelled.
+  /// Throws exception on error.
+  Future<PageSizeInfo?> pdfPageSize({PDFPageSizeParams? params}) async {
+    return PdfBitmapsPlatform.instance.pdfPageSize(params: params);
+  }
+
   /// Cancels running bitmaps operation.
   ///
   /// Returns the cancelling message.

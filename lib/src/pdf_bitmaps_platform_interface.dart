@@ -36,6 +36,10 @@ abstract class PdfBitmapsPlatform extends PlatformInterface {
     throw UnimplementedError('pdfBitmaps() has not been implemented.');
   }
 
+  Future<PageSizeInfo?> pdfPageSize({PDFPageSizeParams? params}) async {
+    throw UnimplementedError('pdfPageSize() has not been implemented.');
+  }
+
   Future<String?> cancelBitmaps() async {
     throw UnimplementedError('cancelBitmaps() has not been implemented.');
   }

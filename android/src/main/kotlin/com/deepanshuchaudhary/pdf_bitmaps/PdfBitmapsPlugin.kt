@@ -138,6 +138,11 @@ class PdfBitmapsPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
                 pdfPath = call.argument("pdfPath"),
                 pagesInfo = parseMethodCallArrayOfPageInfoArgument(call, "pagesInfo") ?: listOf(),
             )
+            "pdfPageSize" -> pdfBitmaps!!.pdfPageSizeInfo(
+                result,
+                pdfPath = call.argument("pdfPath"),
+                pageNumber = call.argument("pageNumber"),
+            )
             "cancelBitmaps" -> pdfBitmaps!!.cancelBitmaps()
             else -> result.notImplemented()
         }

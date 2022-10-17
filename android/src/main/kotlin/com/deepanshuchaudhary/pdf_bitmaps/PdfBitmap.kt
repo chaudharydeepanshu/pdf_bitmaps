@@ -32,9 +32,9 @@ suspend fun getPdfBitmap(
     pdfPath: String?,
     context: Activity,
     pagesInfo: List<PageInfo>,
-): List<ByteArray>? {
+): List<ByteArray> {
 
-    var byteArrayList: MutableList<ByteArray> = mutableListOf()
+    val byteArrayList: MutableList<ByteArray> = mutableListOf()
 
     withContext(Dispatchers.IO) {
 
@@ -106,7 +106,7 @@ suspend fun getPdfBitmap(
                             Utils().rotateBitmap(bitmap, pageInfo.rotationAngle.toFloat())
                         bitmap.recycle()
                         rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-                        var byteArray: ByteArray = stream.toByteArray()
+                        val byteArray: ByteArray = stream.toByteArray()
                         byteArrayList.add(byteArray)
                         rotatedBitmap.recycle()
                         stream.close()

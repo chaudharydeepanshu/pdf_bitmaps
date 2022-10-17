@@ -112,10 +112,10 @@ class _MyTestAppState extends State<MyTestApp> {
                     final params = PDFBitmapsParams(
                       pdfPath: _pickedFilePath![0],
                       pagesInfo: [
-                        PageInfo(pageNumber: 1, scale: 5),
-                        PageInfo(pageNumber: 2, scale: 5),
-                        PageInfo(pageNumber: 3, scale: 5),
-                        PageInfo(pageNumber: 4, scale: 5)
+                        BitmapConfigForPage(pageNumber: 1, scale: 5),
+                        BitmapConfigForPage(pageNumber: 2, scale: 5),
+                        BitmapConfigForPage(pageNumber: 3, scale: 5),
+                        BitmapConfigForPage(pageNumber: 4, scale: 5)
                       ],
                     );
 
