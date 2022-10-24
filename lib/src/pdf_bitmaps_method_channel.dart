@@ -47,6 +47,20 @@ class MethodChannelPdfBitmaps extends PdfBitmapsPlatform {
   }
 
   @override
+  Future<PdfValidityAndProtection?> pdfValidityAndProtection(
+      {PDFValidityAndProtectionParams? params}) async {
+    final List? result = await methodChannel.invokeMethod<List?>(
+        'pdfValidityAndProtection', params?.toJson());
+    result?.cast<List<bool?>>();
+    if (result == null) {
+      return null;
+    } else {
+      return PdfValidityAndProtection(
+          isPDFValid: result[0], isOpenPasswordProtected: result[1]);
+    }
+  }
+
+  @override
   Future<String?> cancelBitmaps() async {
     final String? result =
         await methodChannel.invokeMethod<String?>('cancelBitmaps');
@@ -193,6 +207,50 @@ class PDFPageSizeParams {
     return <String, dynamic>{
       'pdfPath': pdfPath,
       'pageNumber': pageNumber,
+    };
+  }
+}
+
+class PdfValidityAndProtection {
+  /// Is true if pdf is valid.
+  final bool? isPDFValid;
+
+  /// Is true if pdf is user/open password protected.
+  final bool? isOpenPasswordProtected;
+
+  PdfValidityAndProtection({
+    required this.isPDFValid,
+    required this.isOpenPasswordProtected,
+  });
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'isPDFValid': isPDFValid,
+      'isOpenPasswordProtected': isOpenPasswordProtected,
+    };
+  }
+
+  // Implement toString to make it easier to see information
+  // when using the print statement.
+  @override
+  String toString() {
+    return 'PdfValidityAndProtection{isPDFValid: $isPDFValid, isOpenPasswordProtected: $isOpenPasswordProtected}';
+  }
+}
+
+/// Parameters for the [pdfValidityAndProtection] method.
+class PDFValidityAndProtectionParams {
+  /// Provide path of pdf file which you want validity and protection info.
+  final String pdfPath;
+
+  /// Create parameters for the [pdfValidityAndProtection] method.
+  const PDFValidityAndProtectionParams({
+    required this.pdfPath,
+  });
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'pdfPath': pdfPath,
     };
   }
 }

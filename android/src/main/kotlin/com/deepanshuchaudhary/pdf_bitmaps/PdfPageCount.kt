@@ -2,13 +2,11 @@ package com.deepanshuchaudhary.pdf_bitmaps
 
 import android.app.Activity
 import android.graphics.pdf.PdfRenderer
-import android.net.Uri
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
-import java.io.File
 import java.io.FileNotFoundException
 
 // For getting pdf file page count.

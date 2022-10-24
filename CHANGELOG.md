@@ -1,3 +1,7 @@
+## 0.2.4
+
+* Added `pdfValidityAndProtection` method for getting pdf validity and protection info.
+
 ## 0.2.3
 
 * Fixed 0.2.2 changelog.

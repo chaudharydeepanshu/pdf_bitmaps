@@ -7,4 +7,6 @@ export 'src/pdf_bitmaps_method_channel.dart'
         PDFBitmapsParams,
         BitmapConfigForPage,
         PDFPageSizeParams,
-        PageSizeInfo;
+        PageSizeInfo,
+        PDFValidityAndProtectionParams,
+        PdfValidityAndProtection;

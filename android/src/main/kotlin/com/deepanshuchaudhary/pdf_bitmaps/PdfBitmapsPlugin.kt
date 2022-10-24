@@ -143,6 +143,10 @@ class PdfBitmapsPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
                 pdfPath = call.argument("pdfPath"),
                 pageNumber = call.argument("pageNumber"),
             )
+            "pdfValidityAndProtection" -> pdfBitmaps!!.pdfValidityAndProtection(
+                result,
+                pdfPath = call.argument("pdfPath"),
+            )
             "cancelBitmaps" -> pdfBitmaps!!.cancelBitmaps()
             else -> result.notImplemented()
         }
@@ -165,8 +169,7 @@ class PdfBitmapsPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
     }
 
     private fun parseMethodCallArrayOfPageInfoArgument(
-        call: MethodCall,
-        arg: String
+        call: MethodCall, arg: String
     ): List<PageInfo>? {
         if (call.hasArgument(arg)) {
             val tempArrayOfMap = call.argument<ArrayList<Map<String, Any>>>(arg)?.toList()

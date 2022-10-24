@@ -36,6 +36,15 @@ class PdfBitmaps {
     return PdfBitmapsPlatform.instance.pdfPageSize(params: params);
   }
 
+  /// Provides pdf file validity and protection info.
+  ///
+  /// Returns PdfValidityAndProtection for pdf file or null if operation was cancelled.
+  /// Throws exception on error.
+  Future<PdfValidityAndProtection?> pdfValidityAndProtection(
+      {PDFValidityAndProtectionParams? params}) {
+    return PdfBitmapsPlatform.instance.pdfValidityAndProtection(params: params);
+  }
+
   /// Cancels running bitmaps operation.
   ///
   /// Returns the cancelling message.

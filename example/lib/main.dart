@@ -177,9 +177,18 @@ class _MyAppState extends State<MyApp> {
                       await _pdfBitmapsPlugin.pdfPageSize(
                           params: PDFPageSizeParams(
                               pdfPath: _pickedFilePath![0], pageNumber: 1));
-                  print(pageSizeInfo);
+                  log(pageSizeInfo.toString());
                 },
                 child: const Text('Get 1st page size info of pdf')),
+            OutlinedButton(
+                onPressed: () async {
+                  PdfValidityAndProtection? pdfValidityAndProtectionInfo =
+                      await _pdfBitmapsPlugin.pdfValidityAndProtection(
+                          params: PDFValidityAndProtectionParams(
+                              pdfPath: _pickedFilePath![0]));
+                  log(pdfValidityAndProtectionInfo.toString());
+                },
+                child: const Text('PDF Validity And Protection')),
           ],
         ),
       ),

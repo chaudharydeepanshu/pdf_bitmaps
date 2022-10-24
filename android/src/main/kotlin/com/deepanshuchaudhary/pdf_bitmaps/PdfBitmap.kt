@@ -21,10 +21,7 @@ import kotlin.math.floor
 // https://stackoverflow.com/questions/2883355/how-to-render-pdf-in-android
 
 data class PageInfo(
-    var pageNumber: Int,
-    val rotationAngle: Int,
-    val scale: Double,
-    val backgroundColor: String?
+    var pageNumber: Int, val rotationAngle: Int, val scale: Double, val backgroundColor: String?
 )
 
 // For getting pdf file page count.
@@ -43,8 +40,7 @@ suspend fun getPdfBitmap(
         val contentResolver = context.contentResolver
 
         suspend fun renderPage(
-            parcelFileDescriptor: ParcelFileDescriptor?,
-            pagesInfo: List<PageInfo>
+            parcelFileDescriptor: ParcelFileDescriptor?, pagesInfo: List<PageInfo>
         ) {
             try {
                 yield()
@@ -58,10 +54,8 @@ suspend fun getPdfBitmap(
                         yield()
 
                         val pdfBackgroundColor = try {
-                            if (pageInfo.backgroundColor != null)
-                                Color.parseColor(pageInfo.backgroundColor)
-                            else
-                                Color.TRANSPARENT
+                            if (pageInfo.backgroundColor != null) Color.parseColor(pageInfo.backgroundColor)
+                            else Color.TRANSPARENT
                         } catch (e: Exception) {
                             Log.d(PdfBitmapsPlugin.LOG_TAG, "createPdfBitmaps - IN")
                             Log.e("Parse", "Error parsing ${pageInfo.backgroundColor}. $e")
@@ -75,8 +69,7 @@ suspend fun getPdfBitmap(
                         val width: Int = floor(page.width * pageInfo.scale.toFloat()).toInt()
                         val height: Int = floor(page.height * pageInfo.scale.toFloat()).toInt()
                         val bitmap: Bitmap = Bitmap.createBitmap(
-                            width, height,
-                            Bitmap.Config.ARGB_8888
+                            width, height, Bitmap.Config.ARGB_8888
                         )
 
                         bitmap.eraseColor(pdfBackgroundColor)
@@ -84,19 +77,18 @@ suspend fun getPdfBitmap(
                         val matrix = Matrix()
                         matrix.postTranslate((-0).toFloat(), (-0).toFloat())
 
-                        if (pageInfo.scale.toFloat() != 1.0f)
-                            matrix.postScale(pageInfo.scale.toFloat(), pageInfo.scale.toFloat())
+                        if (pageInfo.scale.toFloat() != 1.0f) matrix.postScale(
+                            pageInfo.scale.toFloat(),
+                            pageInfo.scale.toFloat()
+                        )
 
                         page.render(
-                            bitmap,
-                            Rect(
+                            bitmap, Rect(
                                 0,
                                 0,
                                 floor(page.width * pageInfo.scale.toFloat()).toInt(),
                                 floor(page.height * pageInfo.scale.toFloat()).toInt()
-                            ),
-                            matrix,
-                            PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
+                            ), matrix, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
                         )
                         page.close()
 
