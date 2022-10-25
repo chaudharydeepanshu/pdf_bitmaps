@@ -1,3 +1,7 @@
+## 0.2.5
+
+* Fixed rendering issue for pdfs with rotated pages (Verified on Android 7.0 and more info at more info at: https://stackoverflow.com/a/41421216).
+
 ## 0.2.4
 
 * Added `pdfValidityAndProtection` method for getting pdf validity and protection info.

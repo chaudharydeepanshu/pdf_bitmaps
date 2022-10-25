@@ -3,7 +3,6 @@ package com.deepanshuchaudhary.pdf_bitmaps
 import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.graphics.Matrix
 import android.graphics.Rect
 import android.graphics.pdf.PdfRenderer
 import android.os.Build
@@ -74,13 +73,15 @@ suspend fun getPdfBitmap(
 
                         bitmap.eraseColor(pdfBackgroundColor)
 
-                        val matrix = Matrix()
-                        matrix.postTranslate((-0).toFloat(), (-0).toFloat())
-
-                        if (pageInfo.scale.toFloat() != 1.0f) matrix.postScale(
-                            pageInfo.scale.toFloat(),
-                            pageInfo.scale.toFloat()
-                        )
+//                       Not using custom transform because it is leading to wrong rendering for rotated pdf on Android 7.0(Verified by me)
+//                       More info at: https://stackoverflow.com/a/41421216
+//                        val matrix = Matrix()
+//                        matrix.postTranslate((-0).toFloat(), (-0).toFloat())
+//
+//                        if (pageInfo.scale.toFloat() != 1.0f) matrix.postScale(
+//                            pageInfo.scale.toFloat(),
+//                            pageInfo.scale.toFloat()
+//                        )
 
                         page.render(
                             bitmap, Rect(
@@ -88,7 +89,9 @@ suspend fun getPdfBitmap(
                                 0,
                                 floor(page.width * pageInfo.scale.toFloat()).toInt(),
                                 floor(page.height * pageInfo.scale.toFloat()).toInt()
-                            ), matrix, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
+                            ),
+//                            matrix,
+                            null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
                         )
                         page.close()
 
