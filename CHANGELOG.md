@@ -1,3 +1,8 @@
+## 0.3.1
+
+* Updated documentation.
+* Fixed issue with rendering PDF with names containing colon `:`.
+
 ## 0.2.5
 
 * Fixed rendering issue for pdfs with rotated pages (Verified on Android 7.0 and more info at more info at: https://stackoverflow.com/a/41421216).

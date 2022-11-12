@@ -81,6 +81,13 @@ class PDFPageCountParams {
       'pdfPath': pdfPath,
     };
   }
+
+  // Implement toString to make it easier to see information
+  // when using the print statement.
+  @override
+  String toString() {
+    return 'PDFPageCountParams{pdfPath: $pdfPath}';
+  }
 }
 
 class BitmapConfigForPage {
@@ -142,6 +149,13 @@ class PDFBitmapParams {
       'pageInfo': pageInfo.toJson(),
     };
   }
+
+  // Implement toString to make it easier to see information
+  // when using the print statement.
+  @override
+  String toString() {
+    return 'PDFBitmapParams{pdfPath: $pdfPath, pageInfo: $pageInfo}';
+  }
 }
 
 /// Parameters for the [pdfBitmaps] method.
@@ -161,6 +175,13 @@ class PDFBitmapsParams {
       'pdfPath': pdfPath,
       'pagesInfo': pagesInfo.map((e) => e.toJson()).toList(),
     };
+  }
+
+  // Implement toString to make it easier to see information
+  // when using the print statement.
+  @override
+  String toString() {
+    return 'PDFBitmapsParams{pdfPath: $pdfPath, pagesInfo: $pagesInfo}';
   }
 }
 
@@ -209,6 +230,13 @@ class PDFPageSizeParams {
       'pageNumber': pageNumber,
     };
   }
+
+  // Implement toString to make it easier to see information
+  // when using the print statement.
+  @override
+  String toString() {
+    return 'PDFPageSizeParams{pdfPath: $pdfPath, pageNumber: $pageNumber}';
+  }
 }
 
 class PdfValidityAndProtection {
@@ -252,5 +280,12 @@ class PDFValidityAndProtectionParams {
     return <String, dynamic>{
       'pdfPath': pdfPath,
     };
+  }
+
+  // Implement toString to make it easier to see information
+  // when using the print statement.
+  @override
+  String toString() {
+    return 'PDFValidityAndProtectionParams{pdfPath: $pdfPath}';
   }
 }

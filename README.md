@@ -1,15 +1,26 @@
 [![pub package](https://img.shields.io/pub/v/pdf_bitmaps.svg)](https://pub.dev/packages/pdf_bitmaps) [![wakatime](https://wakatime.com/badge/user/83f3b15d-49de-4c01-b8de-bbc132f11be1/project/a86db259-be86-4dbb-a4bc-d503f45a356f.svg)](https://wakatime.com/badge/user/83f3b15d-49de-4c01-b8de-bbc132f11be1/project/a86db259-be86-4dbb-a4bc-d503f45a356f)
 
+## Word from creator
+
+**Hello👋, This package is comletely compatible with flutter and it also supports using Android Uri of picked file to work with which offer some real benifits such as getting pdf any page bitmap without first caching that pdf or validating them without caching.**
+
+**Yes, without a doubt, giving a free 👍 or ⭐ will encourage me to keep working on this plugin.**
+
 ## Package description
 
-A pdf pages bitmaps genrator and page counter which uses Android PdfRenderer.
-
-Note: This package currently supports only Android native URIs of files not absolute file paths and to get the Android native URIs of files you can use [pick_or_save](https://pub.dev/packages/pick_or_save) plugin. Why this behaviour? Well because I needed a plugin which can give me pdf bitmaps using a URI so that I can avoid copying the whole pdf into device cache just to generate bitmaps like other plugins do.
+A flutter PDF pages images genrator which also helps with few other common pdf related things.
 
 ## Features
 
-- Generates bitmaps on the fly using Android native URI.
-- Gets pdf page count using Android native URI.
+- Works on Android 5.0 (API level 21) or later.
+- Generate images of pdf pages using absolute file path or Android native Uri.
+- Ability to generate images of pdf pages with different background color, scale (size/quality), and rotation angle.
+- Check if PDF is valid or not.
+- Check if PDF is protected or not.
+- Get PDF total number of pages count.
+- Get any PDF page width and height.
+
+**Note:** If you are getting errors in you IDE after updating this plugin to newer version and the error contains works like Redeclaration, Conflicting declarations, Overload resolution ambiguity then to fix that you probably need to remove the older version of plugin from pub cache `C:\Users\username\AppData\Local\Pub\Cache\hosted\pub.dev\older_version` or simply run `flutter clean`.
 
 ## Getting started
 
@@ -27,19 +38,60 @@ import 'package:pdf_bitmaps/pdf_bitmaps.dart';
 
 ## Basic Usage
 
-### Getting the page count
+### Getting the PDF total page count
 
 ```dart
-int? pageCount = await PdfBitmaps().pdfPageCount(pdfPath: pdfPath)
+int? pageCount = await PdfBitmaps().pdfPageCount(
+  params: PDFPageCountParams(pdfPath: pdfPath),
+);
 ```
 
-### Getting a pdf page bitmap
+### Getting a PDF page image data
 
 ```dart
-Uint8List? bytes = await PdfBitmaps().pdfBitmap(params: PDFBitmapParams(pdfPath: pdfPath, pageInfo: PageInfo(pageNumber: 5, rotationAngle: 153, scale: 1.6, backgroundColor: Colors.red)));
+Uint8List? bytes = await PdfBitmaps().pdfBitmap(
+  params: PDFBitmapParams(
+    pdfPath: pdfPath,
+    pageInfo: BitmapConfigForPage(
+        pageNumber: 1,
+        rotationAngle: 90,
+        scale: 0.5,
+        backgroundColor: Colors.red),
+  ),
+);
 ```
-Note: ```pageIndex``` starts from 0 to (PdfPageCount - 1) and ```quality``` can be from 1 to 100.
+**Note:**
+- ```scale``` should be greater than 0 and less than or equal to 5. By default it is 1.
+- ```backgroundColor``` is Colors.white by default.
+- ```rotationAngle``` is 0 by default.
 
-| See Example  |
-| ------------- |
-| ![Reference_to_S_from_DC_28-09-2022](https://user-images.githubusercontent.com/85361211/193132735-3d9c4dba-6b12-4ce2-b2a9-4cd2e98d4f8e.gif) | 
+### Getting the PDF validity and protection info
+
+```dart
+PdfValidityAndProtection? pdfValidityAndProtectionInfo = await PdfBitmaps().pdfValidityAndProtection(
+  params: PDFValidityAndProtectionParams(pdfPath: pdfPath),
+);
+
+bool? isPDFValid = pdfValidityAndProtectionInfo?.isPDFValid;
+bool? isPDFProtected = pdfValidityAndProtectionInfo?.isOpenPasswordProtected;
+```
+**Note:**
+- A PDF would still be valid even if it is protected.
+- A PDF is protected if the PDF has an open/user password set.
+
+### Getting a PDF page size info
+
+```dart
+PageSizeInfo? pageSizeInfo = await PdfBitmaps().pdfPageSize(
+  params: PDFPageSizeParams(pdfPath: pdfPath, pageNumber: pageNumber),
+);
+
+int? widthOfPage = pageSizeInfo?.widthOfPage;
+int? heightOfPage = pageSizeInfo?.heightOfPage;
+```
+
+**Note:** To try the demos shown in below gifs run the example included in this plugin.
+
+| Loading PDF pages in Gridview | PDF validity and protection info | PDF page size info |
+| :----: | :---: | :---: |
+| <img src="https://user-images.githubusercontent.com/85361211/201478119-61661f00-789a-4372-a01e-1bbf2496953c.gif"></img> | <img src="https://user-images.githubusercontent.com/85361211/201478141-662d5da1-9d76-4230-bd1c-b90d9c995d6b.gif"></img> | <img src="https://user-images.githubusercontent.com/85361211/201478304-02bdcfc2-9d32-4980-98b0-7c68535328f5.gif"></img> |

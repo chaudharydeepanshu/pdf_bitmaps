@@ -19,7 +19,7 @@ dependencies:
     sdk: flutter
     
   # For picking and saving single or multiple files.
-  pick_or_save: ^0.1.1
+  pick_or_save: ^2.1.4
 
   pdf_bitmaps:
     # When depending on this package from a real application you should use:

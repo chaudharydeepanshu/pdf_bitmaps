@@ -13,6 +13,8 @@ private const val LOG_TAG = "PdfViewer"
 class PdfBitmaps(
     private val activity: Activity
 ) {
+    private val utils = Utils()
+
     private var job: Job? = null
 
     // For getting pdf file page count.
@@ -29,13 +31,13 @@ class PdfBitmaps(
             try {
                 val pageCount: Int? = getPdfPageCount(pdfPath, activity)
 
-                finishPageCountSuccessfully(pageCount, result)
+                utils.finishPageCountSuccessfully(pageCount, result)
             } catch (e: Exception) {
-                finishWithError(
+                utils.finishWithError(
                     "pdfPageCount_exception", e.stackTraceToString(), null, result
                 )
             } catch (e: OutOfMemoryError) {
-                finishWithError(
+                utils.finishWithError(
                     "pdfPageCount_OutOfMemoryError", e.stackTraceToString(), null, result
                 )
             }
@@ -59,16 +61,16 @@ class PdfBitmaps(
                 val pdfPageSizeInfo: List<Int> = getPdfPageSize(pdfPath!!, pageNumber!!, activity)
 
                 if (pdfPageSizeInfo.isEmpty()) {
-                    finishSplitSuccessfullyWithListOfInt(null, result)
+                    utils.finishSplitSuccessfullyWithListOfInt(null, result)
                 } else {
-                    finishSplitSuccessfullyWithListOfInt(pdfPageSizeInfo, result)
+                    utils.finishSplitSuccessfullyWithListOfInt(pdfPageSizeInfo, result)
                 }
             } catch (e: Exception) {
-                finishWithError(
+                utils.finishWithError(
                     "pdfPageSizeInfo_exception", e.stackTraceToString(), null, result
                 )
             } catch (e: OutOfMemoryError) {
-                finishWithError(
+                utils.finishWithError(
                     "pdfPageSizeInfo_OutOfMemoryError", e.stackTraceToString(), null, result
                 )
             }
@@ -91,13 +93,13 @@ class PdfBitmaps(
                     pdfPath, activity, listOf(pageInfo!!)
                 ).get(0)
 
-                finishPdfBitmapSuccessfully(bitmap, result)
+                utils.finishPdfBitmapSuccessfully(bitmap, result)
             } catch (e: Exception) {
-                finishWithError(
+                utils.finishWithError(
                     "pdfBitmap_exception", e.stackTraceToString(), null, result
                 )
             } catch (e: OutOfMemoryError) {
-                finishWithError(
+                utils.finishWithError(
                     "pdfBitmap_OutOfMemoryError", e.stackTraceToString(), null, result
                 )
             }
@@ -119,16 +121,16 @@ class PdfBitmaps(
                 val bitmaps: List<ByteArray>? = getPdfBitmap(pdfPath, activity, pagesInfo!!)
 
                 if (bitmaps != null && bitmaps.isEmpty()) {
-                    finishPdfBitmapsSuccessfully(null, result)
+                    utils.finishPdfBitmapsSuccessfully(null, result)
                 } else {
-                    finishPdfBitmapsSuccessfully(bitmaps, result)
+                    utils.finishPdfBitmapsSuccessfully(bitmaps, result)
                 }
             } catch (e: Exception) {
-                finishWithError(
+                utils.finishWithError(
                     "pdfBitmap_exception", e.stackTraceToString(), null, result
                 )
             } catch (e: OutOfMemoryError) {
-                finishWithError(
+                utils.finishWithError(
                     "pdfBitmap_OutOfMemoryError", e.stackTraceToString(), null, result
                 )
             }
@@ -150,17 +152,17 @@ class PdfBitmaps(
             try {
                 val result: List<Boolean?>? = getPdfValidityAndProtection(pdfPath!!, activity)
 
-                finishSplitSuccessfullyWithListOfBoolean(result, resultCallback)
+                utils.finishSplitSuccessfullyWithListOfBoolean(result, resultCallback)
 
             } catch (e: Exception) {
-                finishWithError(
+                utils.finishWithError(
                     "pdfValidityAndProtection_exception",
                     e.stackTraceToString(),
                     null,
                     resultCallback
                 )
             } catch (e: OutOfMemoryError) {
-                finishWithError(
+                utils.finishWithError(
                     "pdfValidityAndProtection_OutOfMemoryError",
                     e.stackTraceToString(),
                     null,
@@ -175,42 +177,5 @@ class PdfBitmaps(
     ) {
         job?.cancel()
         Log.d(LOG_TAG, "Canceled Bitmaps")
-    }
-
-    private fun finishPageCountSuccessfully(result: Int?, resultCallback: MethodChannel.Result?) {
-        resultCallback?.success(result)
-    }
-
-    private fun finishPdfBitmapSuccessfully(
-        result: ByteArray?, resultCallback: MethodChannel.Result?
-    ) {
-        resultCallback?.success(result)
-    }
-
-    private fun finishPdfBitmapsSuccessfully(
-        result: List<ByteArray>?, resultCallback: MethodChannel.Result?
-    ) {
-        resultCallback?.success(result)
-    }
-
-    private fun finishSplitSuccessfullyWithListOfBoolean(
-        result: List<Boolean?>?, resultCallback: MethodChannel.Result?
-    ) {
-        resultCallback?.success(result)
-    }
-
-    private fun finishSplitSuccessfullyWithListOfInt(
-        result: List<Int>?, resultCallback: MethodChannel.Result?
-    ) {
-        resultCallback?.success(result)
-    }
-
-    private fun finishWithError(
-        errorCode: String,
-        errorMessage: String?,
-        errorDetails: String?,
-        resultCallback: MethodChannel.Result?
-    ) {
-        resultCallback?.error(errorCode, errorMessage, errorDetails)
     }
 }

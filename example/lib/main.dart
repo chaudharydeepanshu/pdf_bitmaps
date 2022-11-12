@@ -7,78 +7,120 @@ import 'package:flutter/services.dart';
 import 'package:pdf_bitmaps/pdf_bitmaps.dart';
 import 'package:pick_or_save/pick_or_save.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(const MyApp());
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'PDF bitmaps example',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(useMaterial3: true),
+      darkTheme: ThemeData.dark(useMaterial3: true),
+      themeMode: ThemeMode.system,
+      home: const MyHomePage(),
+    );
+  }
 }
 
-class _MyAppState extends State<MyApp> {
-  final _pickOrSavePlugin = PickOrSave();
-
-  final bool _localOnly = false;
-  final bool _copyFileToCacheDir = false;
-  List<String>? _pickedFilePath;
-  Uint8List? pageBytes;
-
-  int pdfPageCount = 0;
-  final _pdfBitmapsPlugin = PdfBitmaps();
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
 
   @override
-  void initState() {
-    super.initState();
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      },
+      child: DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          appBar: AppBar(
+            bottom: TabBar(
+              tabs: [
+                Text("GridView Example",
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.labelSmall),
+                Text("Protection & Validity Example",
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.labelSmall),
+                Text("Page Size Info Example",
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.labelSmall),
+              ],
+            ),
+            title: const Text('PDF bitmaps example'),
+          ),
+          body: const TabBarView(
+            children: [
+              LoadingPagesInGridView(),
+              PdfProtectionAndValidityInfo(),
+              GetPageSizeInfo(),
+            ],
+          ),
+        ),
+      ),
+    );
   }
+}
 
-  Future<void> _filePicker(FilePickerParams params) async {
-    List<String>? result;
-    try {
-      result = await _pickOrSavePlugin.filePicker(params: params);
-      log(result.toString());
-    } on PlatformException catch (e) {
-      log(e.toString());
-    }
-    if (!mounted) return;
-    setState(() {
-      _pickedFilePath = result;
-    });
-  }
+class LoadingPagesInGridView extends StatefulWidget {
+  const LoadingPagesInGridView({Key? key}) : super(key: key);
 
-  Future<void> getPDFPageCount({required PDFPageCountParams? params}) async {
-    int pageCount;
-    try {
-      pageCount = await _pdfBitmapsPlugin.pdfPageCount(params: params) ?? 0;
-    } on PlatformException {
-      pageCount = 0;
-    }
-    if (!mounted) return;
+  @override
+  State<LoadingPagesInGridView> createState() => _LoadingPagesInGridViewState();
+}
 
-    setState(() {
-      pdfPageCount = pageCount;
-    });
-  }
+class _LoadingPagesInGridViewState extends State<LoadingPagesInGridView> {
+  final _pickOrSavePlugin = PickOrSave();
+  final _pdfBitmapsPlugin = PdfBitmaps();
 
-  Future<void> getPDFPageBitmap({required PDFBitmapParams? params}) async {
-    Uint8List? bytes;
-    try {
-      bytes = await _pdfBitmapsPlugin.pdfBitmap(params: params);
-    } on PlatformException catch (e) {
-      log(e.toString());
-    }
-    if (!mounted) return;
-
-    setState(() {
-      pageBytes = bytes;
-    });
-  }
-
+  bool _isBusy = false;
+  String? _pickedPDFPath;
+  List<Map<String, dynamic>>? listOfBytesAndIndex;
   bool rejectByteUpdate = false;
 
-  List<Map<String, dynamic>>? listOfBytesAndIndex;
+  int bitmapRotationAngle = 0;
+  double bitmapScale = 0.2;
+  Color bitmapBackgroundColor = Colors.white;
+
+  Future<List<String>?> _filePicker(FilePickerParams params) async {
+    List<String>? result;
+    try {
+      setState(() {
+        _isBusy = true;
+      });
+      result = await _pickOrSavePlugin.filePicker(params: params);
+    } on PlatformException catch (e) {
+      log(e.toString());
+    } catch (e) {
+      log(e.toString());
+    }
+    if (!mounted) return result;
+    setState(() {
+      _isBusy = false;
+    });
+    return result;
+  }
+
+  Future<int?> getPDFPageCount({required PDFPageCountParams? params}) async {
+    int? pageCount;
+    try {
+      pageCount = await _pdfBitmapsPlugin.pdfPageCount(params: params) ?? 0;
+    } on PlatformException catch (e) {
+      log(e.toString());
+    } catch (e) {
+      log(e.toString());
+    }
+    return pageCount;
+  }
 
   void updateBytesIntoList(int index) async {
     if (listOfBytesAndIndex![index]["bytes"] == null &&
@@ -86,9 +128,12 @@ class _MyAppState extends State<MyApp> {
       rejectByteUpdate = true;
       Uint8List? bytes = await _pdfBitmapsPlugin.pdfBitmap(
           params: PDFBitmapParams(
-              pdfPath: _pickedFilePath![0],
-              pageInfo:
-                  BitmapConfigForPage(pageNumber: index + 1, scale: 0.2)));
+              pdfPath: _pickedPDFPath!,
+              pageInfo: BitmapConfigForPage(
+                  pageNumber: index + 1,
+                  rotationAngle: bitmapRotationAngle,
+                  scale: bitmapScale,
+                  backgroundColor: bitmapBackgroundColor)));
       setState(() {
         listOfBytesAndIndex![index]["bytes"] = bytes;
         rejectByteUpdate = false;
@@ -98,100 +143,276 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Column(
-          children: [
-            OutlinedButton(
-                onPressed: () async {
-                  setState(() {
-                    listOfBytesAndIndex = null;
-                    pdfPageCount = 0;
-                    rejectByteUpdate = false;
-                  });
-                },
-                child: const Text('Reset')),
-            OutlinedButton(
-                onPressed: () async {
-                  final params = FilePickerParams(
-                    localOnly: _localOnly,
-                    copyFileToCacheDir: _copyFileToCacheDir,
-                  );
-                  await _filePicker(params);
-                },
-                child: const Text('pick pdf')),
-            OutlinedButton(
-                onPressed: () {
-                  final params = PDFPageCountParams(
-                    pdfPath: _pickedFilePath![0],
-                  );
-                  getPDFPageCount(params: params);
-                },
-                child: const Text('Get page count of selected pdf')),
-            OutlinedButton(
-                onPressed: () {
-                  listOfBytesAndIndex = List<Map<String, dynamic>>.generate(
-                      pdfPageCount,
-                      (int index) => {"index": index, "bytes": null},
-                      growable: true);
-                  setState(() {});
-                },
-                child: const Text('Generate bytes list for pdf')),
-            // OutlinedButton(
-            //     onPressed: () {
-            //       getPDFPageBitmap(
-            //           params: PDFBitmapParams(
-            //               pdfUri: _pickedFilePath![0], pageIndex: 1236));
-            //     },
-            //     child: const Text('Get bitmap')),
-            Center(
-              child: Text('pdfPageCount: $pdfPageCount'),
-            ),
-            listOfBytesAndIndex != null
-                ? Expanded(
-                    child: GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                        ),
-                        itemCount: pdfPageCount,
-                        itemBuilder: (BuildContext context, int index) {
-                          updateBytesIntoList(index);
-                          return listOfBytesAndIndex![index]["bytes"] != null
-                              ? Image.memory(
-                                  listOfBytesAndIndex![index]["bytes"]!,
-                                  // width: 100,
-                                  // height: 100,
-                                  fit: BoxFit.contain,
-                                )
-                              : const CircularProgressIndicator();
-                        }),
-                  )
-                : const SizedBox(),
-            OutlinedButton(
-                onPressed: () async {
-                  PageSizeInfo? pageSizeInfo =
-                      await _pdfBitmapsPlugin.pdfPageSize(
-                          params: PDFPageSizeParams(
-                              pdfPath: _pickedFilePath![0], pageNumber: 1));
-                  log(pageSizeInfo.toString());
-                },
-                child: const Text('Get 1st page size info of pdf')),
-            OutlinedButton(
-                onPressed: () async {
-                  PdfValidityAndProtection? pdfValidityAndProtectionInfo =
-                      await _pdfBitmapsPlugin.pdfValidityAndProtection(
-                          params: PDFValidityAndProtectionParams(
-                              pdfPath: _pickedFilePath![0]));
-                  log(pdfValidityAndProtectionInfo.toString());
-                },
-                child: const Text('PDF Validity And Protection')),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8.0),
+      child: Column(
+        children: [
+          CustomButton(
+              buttonText: 'Pick Single PDF',
+              onPressed: _isBusy
+                  ? null
+                  : () async {
+                      final params = FilePickerParams(
+                          localOnly: false,
+                          mimeTypesFilter: ["application/pdf"],
+                          allowedExtensions: [".pdf"]);
+
+                      List<String>? result = await _filePicker(params);
+
+                      callSnackBar(
+                          mounted: mounted,
+                          context: context,
+                          text: result.toString());
+
+                      if (result != null && result.isNotEmpty) {
+                        setState(() {
+                          _pickedPDFPath = result[0];
+                        });
+
+                        int? pdfPageCount = await getPDFPageCount(
+                            params: PDFPageCountParams(
+                          pdfPath: _pickedPDFPath!,
+                        ));
+
+                        if (pdfPageCount != null) {
+                          setState(() {
+                            listOfBytesAndIndex =
+                                List<Map<String, dynamic>>.generate(
+                                    pdfPageCount,
+                                    (int index) =>
+                                        {"index": index, "bytes": null},
+                                    growable: true);
+                          });
+                        } else {
+                          log("Page count is null");
+                        }
+                      }
+                    }),
+          const SizedBox(height: 8),
+          Text(
+              "Bitmaps Config:\nRotationAngle - $bitmapRotationAngle, Scale - $bitmapScale, BackgroundColor - $bitmapBackgroundColor",
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.labelSmall),
+          const SizedBox(height: 8),
+          listOfBytesAndIndex != null && _pickedPDFPath != null
+              ? Expanded(
+                  child: GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        mainAxisSpacing: 10,
+                      ),
+                      itemCount: listOfBytesAndIndex!.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        updateBytesIntoList(index);
+                        return listOfBytesAndIndex![index]["bytes"] != null
+                            ? Image.memory(
+                                listOfBytesAndIndex![index]["bytes"]!,
+                                // width: 100,
+                                // height: 100,
+                                fit: BoxFit.contain,
+                              )
+                            : const Center(child: CircularProgressIndicator());
+                      }),
+                )
+              : const SizedBox(),
+        ],
       ),
     );
+  }
+}
+
+class PdfProtectionAndValidityInfo extends StatefulWidget {
+  const PdfProtectionAndValidityInfo({Key? key}) : super(key: key);
+
+  @override
+  State<PdfProtectionAndValidityInfo> createState() =>
+      _PdfProtectionAndValidityInfoState();
+}
+
+class _PdfProtectionAndValidityInfoState
+    extends State<PdfProtectionAndValidityInfo> {
+  final _pickOrSavePlugin = PickOrSave();
+  final _pdfBitmapsPlugin = PdfBitmaps();
+
+  bool _isBusy = false;
+  bool? isPDFValid;
+  bool? isPDFProtected;
+
+  Future<List<String>?> _filePicker(FilePickerParams params) async {
+    List<String>? result;
+    try {
+      setState(() {
+        _isBusy = true;
+      });
+      result = await _pickOrSavePlugin.filePicker(params: params);
+    } on PlatformException catch (e) {
+      log(e.toString());
+    } catch (e) {
+      log(e.toString());
+    }
+    if (!mounted) return result;
+    setState(() {
+      _isBusy = false;
+    });
+    return result;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8.0),
+      child: Column(
+        children: [
+          CustomButton(
+              buttonText: 'Pick Single PDF',
+              onPressed: _isBusy
+                  ? null
+                  : () async {
+                      final params = FilePickerParams(
+                          localOnly: false,
+                          mimeTypesFilter: ["application/pdf"],
+                          allowedExtensions: [".pdf"]);
+
+                      List<String>? result = await _filePicker(params);
+
+                      callSnackBar(
+                          mounted: mounted,
+                          context: context,
+                          text: result.toString());
+
+                      if (result != null && result.isNotEmpty) {
+                        PdfValidityAndProtection? pdfValidityAndProtectionInfo =
+                            await _pdfBitmapsPlugin.pdfValidityAndProtection(
+                                params: PDFValidityAndProtectionParams(
+                                    pdfPath: result[0]));
+
+                        setState(() {
+                          isPDFValid = pdfValidityAndProtectionInfo?.isPDFValid;
+                          isPDFProtected = pdfValidityAndProtectionInfo
+                              ?.isOpenPasswordProtected;
+                        });
+                      }
+                    }),
+          const SizedBox(height: 16),
+          Text("PDF Validity: $isPDFValid"),
+          Text("PDF Protected: $isPDFProtected"),
+        ],
+      ),
+    );
+  }
+}
+
+class GetPageSizeInfo extends StatefulWidget {
+  const GetPageSizeInfo({Key? key}) : super(key: key);
+
+  @override
+  State<GetPageSizeInfo> createState() => _GetPageSizeInfoState();
+}
+
+class _GetPageSizeInfoState extends State<GetPageSizeInfo> {
+  final _pickOrSavePlugin = PickOrSave();
+  final _pdfBitmapsPlugin = PdfBitmaps();
+
+  bool _isBusy = false;
+  int pageNumber = 1;
+  int? widthOfPage;
+  int? heightOfPage;
+
+  Future<List<String>?> _filePicker(FilePickerParams params) async {
+    List<String>? result;
+    try {
+      setState(() {
+        _isBusy = true;
+      });
+      result = await _pickOrSavePlugin.filePicker(params: params);
+    } on PlatformException catch (e) {
+      log(e.toString());
+    } catch (e) {
+      log(e.toString());
+    }
+    if (!mounted) return result;
+    setState(() {
+      _isBusy = false;
+    });
+    return result;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8.0),
+      child: Column(
+        children: [
+          CustomButton(
+              buttonText: 'Pick Single PDF',
+              onPressed: _isBusy
+                  ? null
+                  : () async {
+                      final params = FilePickerParams(
+                          localOnly: false,
+                          mimeTypesFilter: ["application/pdf"],
+                          allowedExtensions: [".pdf"]);
+
+                      List<String>? result = await _filePicker(params);
+
+                      callSnackBar(
+                          mounted: mounted,
+                          context: context,
+                          text: result.toString());
+
+                      if (result != null && result.isNotEmpty) {
+                        PageSizeInfo? pageSizeInfo =
+                            await _pdfBitmapsPlugin.pdfPageSize(
+                                params: PDFPageSizeParams(
+                                    pdfPath: result[0],
+                                    pageNumber: pageNumber));
+
+                        setState(() {
+                          widthOfPage = pageSizeInfo?.widthOfPage;
+                          heightOfPage = pageSizeInfo?.heightOfPage;
+                        });
+                      }
+                    }),
+          const SizedBox(height: 16),
+          Text("Info for Page Number: $pageNumber"),
+          Text("Height Of Page: $heightOfPage"),
+          Text("Width Of Page: $widthOfPage"),
+        ],
+      ),
+    );
+  }
+}
+
+class CustomButton extends StatelessWidget {
+  const CustomButton({Key? key, required this.buttonText, this.onPressed})
+      : super(key: key);
+
+  final String buttonText;
+  final void Function()? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton(
+              onPressed: onPressed,
+              child: Text(buttonText, textAlign: TextAlign.center)),
+        ),
+      ],
+    );
+  }
+}
+
+callSnackBar(
+    {required bool mounted,
+    required BuildContext context,
+    required String text}) {
+  if (mounted) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(text),
+    ));
   }
 }
