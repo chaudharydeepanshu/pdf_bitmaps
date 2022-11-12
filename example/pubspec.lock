@@ -129,15 +129,15 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.3.1"
+    version: "0.3.2"
   pick_or_save:
     dependency: "direct main"
     description:
       name: pick_or_save
-      sha256: "2e4cd5491627c69e634e75c34b613e2f25ab71e09e516b08d7b0d467c1816b91"
+      sha256: "3b7841c7c2e8f91fc1262aaff4cae94ff8415da1b9e5abb61db4dcc079cd95c2"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.4"
+    version: "2.1.5"
   plugin_platform_interface:
     dependency: transitive
     description:

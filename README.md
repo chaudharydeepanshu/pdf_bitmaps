@@ -2,13 +2,13 @@
 
 ## Word from creator
 
-**Hello👋, This package is comletely compatible with flutter and it also supports using Android Uri of picked file to work with which offer some real benifits such as getting pdf any page bitmap without first caching that pdf or validating them without caching.**
+**Hello👋, This package is completely compatible with flutter and it also supports using Android Uri of picked file to work with which offer some real benefits such as getting pdf any page bitmap without first caching that pdf or validating them without caching.**
 
 **Yes, without a doubt, giving a free 👍 or ⭐ will encourage me to keep working on this plugin.**
 
 ## Package description
 
-A flutter PDF pages images genrator which also helps with few other common pdf related things.
+A flutter PDF pages images generator which also helps with few other common pdf related things.
 
 ## Features
 
