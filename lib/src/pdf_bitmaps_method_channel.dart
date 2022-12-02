@@ -97,7 +97,7 @@ class BitmapConfigForPage {
   /// Provide pdf page rotation angle.
   final int rotationAngle;
 
-  /// Provide pdf page bitmap scale from 0.1 to 5.
+  /// Provide pdf page bitmap scale greater than 0 and less tan or equal to 5.
   final double scale;
 
   /// Provide pdf page background color.

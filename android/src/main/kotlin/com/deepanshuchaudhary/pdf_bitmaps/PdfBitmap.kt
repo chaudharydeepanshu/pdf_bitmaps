@@ -87,8 +87,8 @@ suspend fun getPdfBitmap(
                             bitmap, Rect(
                                 0,
                                 0,
-                                floor(page.width * pageInfo.scale.toFloat()).toInt(),
-                                floor(page.height * pageInfo.scale.toFloat()).toInt()
+                                floor(page.width * pageInfo.scale).toInt(),
+                                floor(page.height * pageInfo.scale).toInt(),
                             ),
 //                            matrix,
                             null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
