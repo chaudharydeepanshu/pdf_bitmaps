@@ -31,7 +31,7 @@ class PdfBitmaps(
             try {
                 val pageCount: Int? = getPdfPageCount(pdfPath, activity)
 
-                utils.finishPageCountSuccessfully(pageCount, result)
+                utils.finishSuccessfully(pageCount, result)
             } catch (e: Exception) {
                 utils.finishWithError(
                     "pdfPageCount_exception", e.stackTraceToString(), null, result
@@ -52,7 +52,7 @@ class PdfBitmaps(
         pageNumber: Int?,
     ) {
         Log.d(
-            LOG_TAG, "pdfPageSizeInfo - IN, pdfPath=$pdfPath"
+            LOG_TAG, "pdfPageSizeInfo - IN, pdfPath=$pdfPath, pageNumber=$pageNumber"
         )
 
         val uiScope = CoroutineScope(Dispatchers.Main)
@@ -61,9 +61,9 @@ class PdfBitmaps(
                 val pdfPageSizeInfo: List<Int> = getPdfPageSize(pdfPath!!, pageNumber!!, activity)
 
                 if (pdfPageSizeInfo.isEmpty()) {
-                    utils.finishSplitSuccessfullyWithListOfInt(null, result)
+                    utils.finishSuccessfully(null, result)
                 } else {
-                    utils.finishSplitSuccessfullyWithListOfInt(pdfPageSizeInfo, result)
+                    utils.finishSuccessfully(pdfPageSizeInfo, result)
                 }
             } catch (e: Exception) {
                 utils.finishWithError(
@@ -80,20 +80,29 @@ class PdfBitmaps(
 
     // For getting pdf file page bitmap.
     fun pdfBitmap(
-        result: MethodChannel.Result, pdfPath: String?, pageInfo: PageInfo?
+        result: MethodChannel.Result,
+        pdfPath: String?,
+        pageInfo: PageInfo?,
+        pdfRendererType: PdfRendererType,
     ) {
         Log.d(
-            LOG_TAG, "pdfBitmap - IN, pdfPath=$pdfPath"
+            LOG_TAG,
+            "pdfBitmap - IN, pdfPath=$pdfPath, pageInfo=$pageInfo, pdfRendererType=$pdfRendererType"
         )
 
         val uiScope = CoroutineScope(Dispatchers.Main)
         job = uiScope.launch {
             try {
-                val bitmap: ByteArray? = getPdfBitmap(
-                    pdfPath, activity, listOf(pageInfo!!)
-                ).get(0)
+                val imageFilesPaths: List<String> = getPdfBitmap(
+                    pdfPath!!, activity, listOf(pageInfo!!), pdfRendererType
+                )
 
-                utils.finishPdfBitmapSuccessfully(bitmap, result)
+                if (imageFilesPaths.isEmpty()) {
+                    utils.finishSuccessfully(null, result)
+                } else {
+                    utils.finishSuccessfully(imageFilesPaths[0], result)
+                }
+
             } catch (e: Exception) {
                 utils.finishWithError(
                     "pdfBitmap_exception", e.stackTraceToString(), null, result
@@ -109,21 +118,26 @@ class PdfBitmaps(
 
     // For getting pdf file pages bitmaps.
     fun pdfBitmaps(
-        result: MethodChannel.Result, pdfPath: String?, pagesInfo: List<PageInfo>?
+        result: MethodChannel.Result,
+        pdfPath: String?,
+        pagesInfo: List<PageInfo>?,
+        pdfRendererType: PdfRendererType,
     ) {
         Log.d(
-            LOG_TAG, "pdfBitmap - IN, pdfPath=$pdfPath"
+            LOG_TAG,
+            "pdfBitmap - IN, pdfPath=$pdfPath, pagesInfo=$pagesInfo, pdfRendererType=$pdfRendererType"
         )
 
         val uiScope = CoroutineScope(Dispatchers.Main)
         job = uiScope.launch {
             try {
-                val bitmaps: List<ByteArray>? = getPdfBitmap(pdfPath, activity, pagesInfo!!)
+                val imageFilesPaths: List<String> =
+                    getPdfBitmap(pdfPath!!, activity, pagesInfo!!, pdfRendererType)
 
-                if (bitmaps != null && bitmaps.isEmpty()) {
-                    utils.finishPdfBitmapsSuccessfully(null, result)
+                if (imageFilesPaths.isEmpty()) {
+                    utils.finishSuccessfully(null, result)
                 } else {
-                    utils.finishPdfBitmapsSuccessfully(bitmaps, result)
+                    utils.finishSuccessfully(imageFilesPaths, result)
                 }
             } catch (e: Exception) {
                 utils.finishWithError(
@@ -150,9 +164,9 @@ class PdfBitmaps(
         val uiScope = CoroutineScope(Dispatchers.Main)
         job = uiScope.launch {
             try {
-                val result: List<Boolean?>? = getPdfValidityAndProtection(pdfPath!!, activity)
+                val result: List<Boolean?> = getPdfValidityAndProtection(pdfPath!!, activity)
 
-                utils.finishSplitSuccessfullyWithListOfBoolean(result, resultCallback)
+                utils.finishSuccessfully(result, resultCallback)
 
             } catch (e: Exception) {
                 utils.finishWithError(

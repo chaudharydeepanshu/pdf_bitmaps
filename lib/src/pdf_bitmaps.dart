@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:pdf_bitmaps/src/pdf_bitmaps_method_channel.dart';
 import 'package:pdf_bitmaps/src/pdf_bitmaps_platform_interface.dart';
 
@@ -16,7 +14,7 @@ class PdfBitmaps {
   ///
   /// Returns the bitmap or null if operation was cancelled.
   /// Throws exception on error.
-  Future<Uint8List?> pdfBitmap({PDFBitmapParams? params}) async {
+  Future<String?> pdfBitmap({PDFBitmapParams? params}) async {
     return PdfBitmapsPlatform.instance.pdfBitmap(params: params);
   }
 
@@ -24,7 +22,7 @@ class PdfBitmaps {
   ///
   /// Returns the bitmap or null if operation was cancelled.
   /// Throws exception on error.
-  Future<List<Uint8List>?> pdfBitmaps({PDFBitmapsParams? params}) async {
+  Future<List<String>?> pdfBitmaps({PDFBitmapsParams? params}) async {
     return PdfBitmapsPlatform.instance.pdfBitmaps(params: params);
   }
 

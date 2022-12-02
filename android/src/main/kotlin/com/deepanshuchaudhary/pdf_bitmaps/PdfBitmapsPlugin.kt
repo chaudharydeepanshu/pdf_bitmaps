@@ -132,11 +132,15 @@ class PdfBitmapsPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
                     scale = call.argument<Map<String, Double>>("pageInfo")!!["scale"]!!,
                     backgroundColor = call.argument<Map<String, String>>("pageInfo")!!["backgroundColor"]!!
                 ),
+                pdfRendererType = parseMethodCallPdfRendererTypeArgument(call)
+                    ?: PdfRendererType.AndroidPdfRenderer,
             )
             "pdfBitmaps" -> pdfBitmaps!!.pdfBitmaps(
                 result,
                 pdfPath = call.argument("pdfPath"),
                 pagesInfo = parseMethodCallArrayOfPageInfoArgument(call, "pagesInfo") ?: listOf(),
+                pdfRendererType = parseMethodCallPdfRendererTypeArgument(call)
+                    ?: PdfRendererType.AndroidPdfRenderer,
             )
             "pdfPageSize" -> pdfBitmaps!!.pdfPageSizeInfo(
                 result,
@@ -184,6 +188,21 @@ class PdfBitmapsPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
                 pagesInfo.add(temp)
             }
             return pagesInfo
+        }
+        return null
+    }
+
+    private fun parseMethodCallPdfRendererTypeArgument(call: MethodCall): PdfRendererType? {
+        val arg = "pdfRendererType"
+
+        if (call.hasArgument(arg)) {
+            return if (call.argument<String>(arg)
+                    ?.toString() == "PdfRendererType.pdfBoxPdfRenderer"
+            ) {
+                PdfRendererType.PdfBoxPdfRenderer
+            } else {
+                PdfRendererType.AndroidPdfRenderer
+            }
         }
         return null
     }

@@ -1,8 +1,8 @@
+import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'dart:async';
-
 import 'package:flutter/services.dart';
 import 'package:pdf_bitmaps/pdf_bitmaps.dart';
 import 'package:pick_or_save/pick_or_save.dart';
@@ -88,8 +88,9 @@ class _LoadingPagesInGridViewState extends State<LoadingPagesInGridView> {
   bool rejectByteUpdate = false;
 
   int bitmapRotationAngle = 0;
-  double bitmapScale = 0.2;
+  double bitmapScale = 1;
   Color bitmapBackgroundColor = Colors.white;
+  PdfRendererType pdfRendererType = PdfRendererType.androidPdfRenderer;
 
   Future<List<String>?> _filePicker(FilePickerParams params) async {
     List<String>? result;
@@ -126,14 +127,19 @@ class _LoadingPagesInGridViewState extends State<LoadingPagesInGridView> {
     if (listOfBytesAndIndex![index]["bytes"] == null &&
         rejectByteUpdate != true) {
       rejectByteUpdate = true;
-      Uint8List? bytes = await _pdfBitmapsPlugin.pdfBitmap(
-          params: PDFBitmapParams(
-              pdfPath: _pickedPDFPath!,
-              pageInfo: BitmapConfigForPage(
-                  pageNumber: index + 1,
-                  rotationAngle: bitmapRotationAngle,
-                  scale: bitmapScale,
-                  backgroundColor: bitmapBackgroundColor)));
+      String? imageFilePath = await _pdfBitmapsPlugin.pdfBitmap(
+        params: PDFBitmapParams(
+          pdfPath: _pickedPDFPath!,
+          pageInfo: BitmapConfigForPage(
+            pageNumber: index + 1,
+            rotationAngle: bitmapRotationAngle,
+            scale: bitmapScale,
+            backgroundColor: bitmapBackgroundColor,
+          ),
+          pdfRendererType: pdfRendererType,
+        ),
+      );
+      Uint8List? bytes = File(imageFilePath!).readAsBytesSync();
       setState(() {
         listOfBytesAndIndex![index]["bytes"] = bytes;
         rejectByteUpdate = false;
@@ -159,10 +165,9 @@ class _LoadingPagesInGridViewState extends State<LoadingPagesInGridView> {
 
                       List<String>? result = await _filePicker(params);
 
-                      callSnackBar(
-                          mounted: mounted,
-                          context: context,
-                          text: result.toString());
+                      if (mounted) {
+                        callSnackBar(context: context, text: result.toString());
+                      }
 
                       if (result != null && result.isNotEmpty) {
                         setState(() {
@@ -190,7 +195,7 @@ class _LoadingPagesInGridViewState extends State<LoadingPagesInGridView> {
                     }),
           const SizedBox(height: 8),
           Text(
-              "Bitmaps Config:\nRotationAngle - $bitmapRotationAngle, Scale - $bitmapScale, BackgroundColor - $bitmapBackgroundColor",
+              "Bitmaps Config:\nRotationAngle - $bitmapRotationAngle, Scale - $bitmapScale, BackgroundColor - $bitmapBackgroundColor, PdfRendererType - $pdfRendererType",
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.labelSmall),
           const SizedBox(height: 8),
@@ -276,10 +281,9 @@ class _PdfProtectionAndValidityInfoState
 
                       List<String>? result = await _filePicker(params);
 
-                      callSnackBar(
-                          mounted: mounted,
-                          context: context,
-                          text: result.toString());
+                      if (mounted) {
+                        callSnackBar(context: context, text: result.toString());
+                      }
 
                       if (result != null && result.isNotEmpty) {
                         PdfValidityAndProtection? pdfValidityAndProtectionInfo =
@@ -356,10 +360,9 @@ class _GetPageSizeInfoState extends State<GetPageSizeInfo> {
 
                       List<String>? result = await _filePicker(params);
 
-                      callSnackBar(
-                          mounted: mounted,
-                          context: context,
-                          text: result.toString());
+                      if (mounted) {
+                        callSnackBar(context: context, text: result.toString());
+                      }
 
                       if (result != null && result.isNotEmpty) {
                         PageSizeInfo? pageSizeInfo =
@@ -405,14 +408,9 @@ class CustomButton extends StatelessWidget {
   }
 }
 
-callSnackBar(
-    {required bool mounted,
-    required BuildContext context,
-    required String text}) {
-  if (mounted) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(text),
-    ));
-  }
+callSnackBar({required BuildContext context, required String text}) {
+  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    content: Text(text),
+  ));
 }

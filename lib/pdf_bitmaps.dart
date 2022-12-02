@@ -1,5 +1,4 @@
 export 'src/pdf_bitmaps.dart' show PdfBitmaps;
-
 export 'src/pdf_bitmaps_method_channel.dart'
     show
         PDFBitmapParams,
@@ -9,4 +8,5 @@ export 'src/pdf_bitmaps_method_channel.dart'
         PDFPageSizeParams,
         PageSizeInfo,
         PDFValidityAndProtectionParams,
-        PdfValidityAndProtection;
+        PdfValidityAndProtection,
+        PdfRendererType;

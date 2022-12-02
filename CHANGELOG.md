@@ -1,3 +1,17 @@
+## 1.0.0
+
+* BREAKING: `pdfBitmap()` now provides a cached file path of the rendered image instead of Uint8List.
+  
+  For migration: Replace the `pdfBitmap()` result type to String? and then convert path to Uint8List using File(path).readAsBytesSync().
+
+* BREAKING: `pdfBitmaps()` now provides a list cached files paths of the rendered images instead of list of Uint8List.
+
+  For migration: Replace the `pdfBitmaps()` result type to List<String>? and then convert each path to Uint8List using File(path).readAsBytesSync().
+
+* Added `pdfRendererType` to `pdfBitmap()` and `pdfBitmaps()` for choosing different renderers of choice and benefits.
+
+* Added new type of renderer based on amazing library PDFBox android port [PdfBox-Android](https://github.com/TomRoush/PdfBox-Android) by [TomRoush](https://github.com/TomRoush).
+
 ## 0.3.3
 
 * Updated documentation.

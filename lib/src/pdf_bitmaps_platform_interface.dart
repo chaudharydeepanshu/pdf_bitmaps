@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:pdf_bitmaps/src/pdf_bitmaps_method_channel.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
@@ -28,11 +26,11 @@ abstract class PdfBitmapsPlatform extends PlatformInterface {
     throw UnimplementedError('pdfPageCount() has not been implemented.');
   }
 
-  Future<Uint8List?> pdfBitmap({PDFBitmapParams? params}) async {
+  Future<String?> pdfBitmap({PDFBitmapParams? params}) async {
     throw UnimplementedError('pdfBitmap() has not been implemented.');
   }
 
-  Future<List<Uint8List>?> pdfBitmaps({PDFBitmapsParams? params}) async {
+  Future<List<String>?> pdfBitmaps({PDFBitmapsParams? params}) async {
     throw UnimplementedError('pdfBitmaps() has not been implemented.');
   }
 

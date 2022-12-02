@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -18,17 +17,17 @@ class MethodChannelPdfBitmaps extends PdfBitmapsPlatform {
   }
 
   @override
-  Future<Uint8List?> pdfBitmap({PDFBitmapParams? params}) async {
-    final Uint8List? bytes = await methodChannel.invokeMethod<Uint8List?>(
+  Future<String?> pdfBitmap({PDFBitmapParams? params}) async {
+    final String? bytes = await methodChannel.invokeMethod<String?>(
         'pdfBitmap', params?.toJson());
     return bytes;
   }
 
   @override
-  Future<List<Uint8List>?> pdfBitmaps({PDFBitmapsParams? params}) async {
+  Future<List<String>?> pdfBitmaps({PDFBitmapsParams? params}) async {
     final List? bytesList =
         await methodChannel.invokeMethod<List?>('pdfBitmaps', params?.toJson());
-    return bytesList?.cast<Uint8List>();
+    return bytesList?.cast<String>();
   }
 
   @override
@@ -129,6 +128,8 @@ class BitmapConfigForPage {
   }
 }
 
+enum PdfRendererType { androidPdfRenderer, pdfBoxPdfRenderer }
+
 /// Parameters for the [pdfBitmap] method.
 class PDFBitmapParams {
   /// Provide path of pdf file for bitmap.
@@ -137,16 +138,28 @@ class PDFBitmapParams {
   /// Provide PageInfo for page of pdf for which you want bitmap.
   final BitmapConfigForPage pageInfo;
 
+  /// Provide the type of renderer you want to use for rendering pdf to image.
+  ///
+  /// For pdf having pages with large or complex data such as high resolution
+  /// images then PdfRendererType.pdfBoxPdfRenderer is recommended because in
+  /// that case PdfRendererType.androidPdfRenderer may give you a completely
+  /// white useless image.
+  ///
+  /// By default pdfRendererType = PdfRendererType.androidPdfRenderer.
+  final PdfRendererType pdfRendererType;
+
   /// Create parameters for the [pdfBitmap] method.
   const PDFBitmapParams({
     required this.pdfPath,
     required this.pageInfo,
+    this.pdfRendererType = PdfRendererType.androidPdfRenderer,
   });
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'pdfPath': pdfPath,
       'pageInfo': pageInfo.toJson(),
+      'pdfRendererType': pdfRendererType.toString(),
     };
   }
 
@@ -154,7 +167,7 @@ class PDFBitmapParams {
   // when using the print statement.
   @override
   String toString() {
-    return 'PDFBitmapParams{pdfPath: $pdfPath, pageInfo: $pageInfo}';
+    return 'PDFBitmapParams{pdfPath: $pdfPath, pageInfo: $pageInfo, pdfRendererType: $pdfRendererType}';
   }
 }
 
@@ -166,14 +179,28 @@ class PDFBitmapsParams {
   /// Provide PageInfo List for pages of pdf for which you want bitmap.
   final List<BitmapConfigForPage> pagesInfo;
 
+  /// Provide the type of renderer you want to use for rendering pdf to image.
+  ///
+  /// For pdf having pages with large or complex data such as high resolution
+  /// images then PdfRendererType.pdfBoxPdfRenderer is recommended because in
+  /// that case PdfRendererType.androidPdfRenderer may give you a completely
+  /// white useless image.
+  ///
+  /// By default pdfRendererType = PdfRendererType.androidPdfRenderer.
+  final PdfRendererType pdfRendererType;
+
   /// Create parameters for the [pdfBitmaps] method.
-  const PDFBitmapsParams({required this.pdfPath, required this.pagesInfo})
-      : assert(pagesInfo.length > 0, 'pagesInfo list cant be empty');
+  const PDFBitmapsParams({
+    required this.pdfPath,
+    required this.pagesInfo,
+    this.pdfRendererType = PdfRendererType.androidPdfRenderer,
+  }) : assert(pagesInfo.length > 0, 'pagesInfo list cant be empty');
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'pdfPath': pdfPath,
       'pagesInfo': pagesInfo.map((e) => e.toJson()).toList(),
+      'pdfRendererType': pdfRendererType.toString(),
     };
   }
 
@@ -181,7 +208,7 @@ class PDFBitmapsParams {
   // when using the print statement.
   @override
   String toString() {
-    return 'PDFBitmapsParams{pdfPath: $pdfPath, pagesInfo: $pagesInfo}';
+    return 'PDFBitmapsParams{pdfPath: $pdfPath, pagesInfo: $pagesInfo, pdfRendererType: $pdfRendererType}';
   }
 }
 
