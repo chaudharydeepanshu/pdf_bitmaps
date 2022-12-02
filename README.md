@@ -49,21 +49,26 @@ int? pageCount = await PdfBitmaps().pdfPageCount(
 ### Getting a PDF page image data
 
 ```dart
-Uint8List? bytes = await PdfBitmaps().pdfBitmap(
+String? imageCachedPath = await PdfBitmaps().pdfBitmap(
   params: PDFBitmapParams(
     pdfPath: pdfPath,
     pageInfo: BitmapConfigForPage(
         pageNumber: 1,
         rotationAngle: 90,
         scale: 0.5,
-        backgroundColor: Colors.red),
+        backgroundColor: Colors.red,
+    ),
+    pdfRendererType: PdfRendererType.androidPdfRenderer,
   ),
 );
+
+Uint8List? bytes = File(imageCachedPath!).readAsBytesSync();
 ```
 **Note:**
-- ```scale``` should be greater than 0 and less than or equal to 5. By default it is 1.
-- ```backgroundColor``` is Colors.white by default.
-- ```rotationAngle``` is 0 by default.
+- `scale` should be greater than 0 and less than or equal to 5. By default it is 1.
+- `backgroundColor` is Colors.white by default.
+- `rotationAngle` is 0 by default.
+- `pdfRendererType` is PdfRendererType.androidPdfRenderer by default as its fast but PdfRendererType.pdfBoxPdfRenderer is recommended for PDF with very high resolution images as PdfRendererType.androidPdfRenderer may create a white useless image.
 
 ### Getting the PDF validity and protection info
 
