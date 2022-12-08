@@ -1,3 +1,8 @@
+## 1.0.1
+
+* Fixes issue of unnecessarily creating copy of PDF when using android renderer.(Due to changes made in 1.0.0)
+* Fixes issue of not deleting PDF copy which was created when using PDFBox renderer.(Due to changes made in 1.0.0)
+
 ## 1.0.0
 
 * BREAKING: `pdfBitmap()` now provides a cached file path of the rendered image instead of Uint8List.

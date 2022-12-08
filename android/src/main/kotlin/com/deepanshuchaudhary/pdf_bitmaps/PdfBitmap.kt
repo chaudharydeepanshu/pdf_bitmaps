@@ -53,17 +53,18 @@ suspend fun getPdfBitmap(
 
         val uri = utils.getURI(pdfPath)
 
-        PDFBoxResourceLoader.init(context)
-
-        val pdfTempFile: File = File.createTempFile("writerTempFile", ".pdf")
-
-        utils.copyDataFromSourceToDestDocument(
-            sourceFileUri = uri,
-            destinationFileUri = pdfTempFile.toUri(),
-            contentResolver = contentResolver
-        )
-
         imageFilesPathsList = if (pdfRendererType == PdfRendererType.PdfBoxPdfRenderer) {
+
+            PDFBoxResourceLoader.init(context)
+
+            val pdfTempFile: File = File.createTempFile("writerTempFile", ".pdf")
+
+            utils.copyDataFromSourceToDestDocument(
+                sourceFileUri = uri,
+                destinationFileUri = pdfTempFile.toUri(),
+                contentResolver = contentResolver
+            )
+
             renderFile(pdfTempFile, pagesInfo)
         } else {
             renderPage(uri, contentResolver, pagesInfo)
@@ -101,7 +102,7 @@ suspend fun renderFile(sourcePdfFile: File, pagesInfo: List<PageInfo>): List<Str
                 Color.TRANSPARENT
             }
 
-           val page = document.getPage(pageInfo.pageNumber - 1)
+            val page = document.getPage(pageInfo.pageNumber - 1)
 
             // Create new empty bitmap for a colored background
             val width: Int = floor(page.mediaBox.width * pageInfo.scale.toFloat()).toInt()
@@ -115,9 +116,7 @@ suspend fun renderFile(sourcePdfFile: File, pagesInfo: List<PageInfo>): List<Str
 
             // Render the image to an ARGB Bitmap
             val pageImage = renderer.renderImage(
-                pageInfo.pageNumber - 1,
-                pageInfo.scale.toFloat(),
-                ImageType.ARGB
+                pageInfo.pageNumber - 1, pageInfo.scale.toFloat(), ImageType.ARGB
             )
 
             // Overlaying image bitmap over empty bitmap
@@ -140,6 +139,8 @@ suspend fun renderFile(sourcePdfFile: File, pagesInfo: List<PageInfo>): List<Str
         document.close()
     } catch (e: IOException) {
         Log.e("PdfBox-Android", "Exception thrown while rendering file", e)
+    } finally {
+        sourcePdfFile.delete()
     }
     return imageRenderFilesPaths
 }
